@@ -25,7 +25,7 @@ if (isset($data['signup'])) {
         $user->email = $data['email'];
         $user->password = password_hash($data['password'], PASSWORD_DEFAULT);
         $user->avatar = "avatar.jpg";
-        $user->name = null;
+        $user->person = null;
         $user->phone = null;
         $user->car =null;
         $user->gender=true;
