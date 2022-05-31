@@ -48,6 +48,7 @@ if (isset($data['profile'])) {
     $user->person = $data['person'];
     $user->phone = $data['phone'];
     $user->car = $data['car'];
+    $user->gender= $data['gender'];
     R::store($user);
 
     header("Location: /profile.php");
@@ -205,18 +206,53 @@ if (isset($data['profile'])) {
                     </div>
                     <!--Checkbox gender of the person-->
                     <div class="d-flex flex-row" style="margin-top: 30px;">
-                        <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
+
+                        <?php if($user->gender == "female") {
+                            echo '<div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
                              style="margin-right: 25px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
-                            <input class="form-check-input" type="radio" id="formCheck-1"
+                            <input class="form-check-input" name="gender" type="radio" value="female" checked id="formCheck-1"
                                    style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
                                     class="form-check-label" for="formCheck-1"
                                     style="color: #14142b;font-weight: bold;">Женщина</label></div>
                         <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
                              style="margin-right: 0px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
-                            <input class="form-check-input" type="radio" id="formCheck-2"
+                            <input class="form-check-input" name="gender" type="radio" value="male" id="formCheck-2"
                                    style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
                                     class="form-check-label" for="formCheck-2"
-                                    style="color: #14142b;font-weight: bold;">Мужчина</label></div>
+                                    style="color: #14142b;font-weight: bold;">Мужчина</label></div>';
+                        } else
+                        if($user->gender == "male"){
+                           echo '<div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
+                             style="margin-right: 25px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
+                            <input class="form-check-input" name="gender" type="radio" value="female"  id="formCheck-1"
+                                   style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
+                                    class="form-check-label" for="formCheck-1"
+                                    style="color: #14142b;font-weight: bold;">Женщина</label></div>
+                        <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
+                             style="margin-right: 0px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
+                            <input class="form-check-input" name="gender" type="radio" value="male" checked id="formCheck-2"
+                                   style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
+                                    class="form-check-label" for="formCheck-2"
+                                    style="color: #14142b;font-weight: bold;">Мужчина</label></div>';
+                        } else
+                            if($user->gender == null) {
+                                echo '<div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
+                             style="margin-right: 25px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
+                            <input class="form-check-input" name="gender" type="radio" value="female"  id="formCheck-1"
+                                   style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
+                                    class="form-check-label" for="formCheck-1"
+                                    style="color: #14142b;font-weight: bold;">Женщина</label></div>
+                        <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
+                             style="margin-right: 0px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
+                            <input class="form-check-input" name="gender" type="radio" value="male" id="formCheck-2"
+                                   style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
+                                    class="form-check-label" for="formCheck-2"
+                                    style="color: #14142b;font-weight: bold;">Мужчина</label></div>';
+                            }
+
+                            ?>
+
+
                     </div>
 
                     <!--Change password-->
