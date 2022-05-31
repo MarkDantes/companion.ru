@@ -1,4 +1,6 @@
-
+<?php
+require "db.php";
+?>
 <!DOCTYPE html>
 <html lang="en" style="--bs-body-bg: #f7f7fc;">
 
@@ -37,10 +39,15 @@
                     <img src="assets/img/avatars/avatar.jpg" alt="mdo" width="48" height="48" class="rounded-circle">
                 </a>
                 <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
-                    <li><a class="dropdown-item" href="profile.php">Профиль</a></li>
-                    <li><a class="dropdown-item" href="history.php">Истории</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="index.php">Выйти</a></li>
+                    <?php if(isset($_SESSION['logged_user'])) : ?>
+                        <li><a class="dropdown-item" href="profile.php">Профиль</a></li>
+                        <li><a class="dropdown-item" href="history.php">Истории</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="exit.php">Выйти</a></li>
+                    <?php else : ?>
+                        <li><a class="dropdown-item" href="login.php">Профиль</a></li>
+                        <li><a class="dropdown-item" href="login.php">Истории</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
             </div>
