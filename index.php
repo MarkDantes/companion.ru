@@ -1,6 +1,3 @@
-<?php
-require "db.php"
-?>
 
 <!DOCTYPE html>
 <html lang="en" style="--bs-body-bg: #f7f7fc;">

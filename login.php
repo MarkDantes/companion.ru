@@ -1,6 +1,3 @@
-<?php
-require "db.php";
-?>
 
 <!DOCTYPE html>
 <html lang="en" style="color: #5f2eea;--bs-body-bg: #f7f7fc;font-family: Poppins, sans-serif;">
@@ -60,7 +57,7 @@ require "db.php";
                                 <div class="mb-3"><input class="form-control" type="email" name="email" placeholder="Email" style="width: 325px;height: 64px;margin-top: 30px;margin-bottom: 0px;" required></div>
                                 <div class="mb-3"><input class="form-control" type="password" name="password" placeholder="Password" style="height: 64px;margin-top: 30px;margin-bottom: 0px;" required></div>
                                 <div class="mb-3"><button class="btn btn-primary shadow d-block w-100" type="submit" style="color: var(--bs-white);background: #5f2eea;width: 319px;height: 64px;border-radius: 16px;margin-top: 30px;">Вход</button></div>
-                                <p class="text-muted">Забыли пароль?</p>
+                                <p class="text-muted"><a href="signup.php">Регистрация</a></p>
                             </form>
                         </div>
                     </div>
