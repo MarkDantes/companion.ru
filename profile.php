@@ -2,24 +2,20 @@
 require "db.php";
 
 $data = $_POST;
-$user = R::findOne('users','id = ?', array($_SESSION['logged_user']->id));
+$user = R::findOne('users', 'id = ?', array($_SESSION['logged_user']->id));
 
-function loadAvatar($avatar){
+function loadAvatar($avatar, $user)
+{
     $type = $avatar['type'];
     //hash with md5
-    $name = md5(microtime()).'.'.substr($type, strlen("image/"));
+    $name = md5(microtime()) . '.' . substr($type, strlen("image/"));
     $dir = 'assets/img/avatars/';
-    $uploadfile = $dir.$name;
+    $uploadfile = $dir . $name;
 
     //Временная дирректория -> постоянная
-    if(move_uploaded_file($avatar['tmp_name'], $uploadfile)){
-        $user = R::findOne('users','id = ?', array($_SESSION['logged_user']->id));
-        $user->avatar=$name;
-        R::store($user);
-
-    }
-    else
-    {
+    if (move_uploaded_file($avatar['tmp_name'], $uploadfile)) {
+        $user->avatar = $name;
+    } else {
         return false;
     }
     return true;
@@ -29,16 +25,33 @@ if (!isset($_SESSION['logged_user'])) {
     header("Location: /login.php");
 }
 
-if(isset($data['profile']))
-{
+if (isset($data['profile'])) {
     $avatar = $_FILES['avatar'];
-    if (avatarSecurity($avatar))
-    {
-        loadAvatar($avatar);
+    if (avatarSecurity($avatar)) {
+        loadAvatar($avatar, $user);
     }
+
+
+    if ($data['newpassword'] == '' && $data['lastpassword'] != '' || $data['newpassword'] != '' && $data['lastpassword'] == '') {
+        $errors[] = 'Введите пароль!';
+    }
+    if (empty($errors)) {
+        if (password_verify($data['lastpassword'], $user->password)) {
+            $user->password = password_hash($data['newpassword'], PASSWORD_DEFAULT);
+
+        } else {
+            $errors[] = 'Неверный пароль!';
+        }
+    }
+
+    $user->email = $data['email'];
+    $user->person = $data['person'];
+    $user->phone = $data['phone'];
+    $user->car = $data['car'];
+    R::store($user);
+
     header("Location: /profile.php");
 }
-
 
 
 ?>
@@ -95,7 +108,8 @@ if(isset($data['profile']))
                          style="width: 300px;">
                         <div class="col-4 col-sm-3 col-md-3 col-lg-3 col-xl-3 col-xxl-3 offset-1 offset-sm-2 offset-md-2 offset-lg-2 offset-xl-2 offset-xxl-2 d-flex d-xxl-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
                              style="margin-left: 0px;"><img class="rounded-circle d-flex d-xl-flex"
-                                                            src="assets/img/avatars/<?php echo $user->avatar;?>" width="60px" height="60px"
+                                                            src="assets/img/avatars/<?php echo $user->avatar; ?>"
+                                                            width="60px" height="60px"
                                                             style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;"/><input
                                     class="form-control form-control-sm d-flex" type="file" name="avatar"
                                     style="height: 24.8px;font-size: 9px;margin-left: 0px;padding: 6px;padding-left: 5px;"/>
@@ -103,7 +117,7 @@ if(isset($data['profile']))
                         <p style="font-size: 12px;margin-left: 20px;"></p><input
                                 class="form-control d-flex d-xl-flex flex-shrink-1" type="text"
                                 style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
-                                placeholder="Имя Фамилия" autocomplete="on" required inputmode="latin-name"/>
+                                placeholder="Имя Фамилия" name ="person" value="<?php echo $user->person; ?>" autocomplete="on" required inputmode="latin-name"/>
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none"
                              style="margin-bottom: 7px;width: 24px;height: 24px;">
                             <path d="M15.2322 5.23223L18.7677 8.76777M16.7322 3.73223C17.7085 2.75592 19.2914 2.75592 20.2677 3.73223C21.244 4.70854 21.244 6.29146 20.2677 7.26777L6.5 21.0355H3V17.4644L16.7322 3.73223Z"
@@ -119,6 +133,8 @@ if(isset($data['profile']))
                               style="background: #eff0f6;height: 70px;width: 45px;padding-top: 16.6px;padding-right: 13px;padding-left: 25px;border-style: none;border-top-color: #14142b;border-bottom-color: #14142b;border-left-color: #14142b;"><i
                                     class="fas fa-mobile-alt d-lg-flex align-items-lg-center"
                                     style="width: 24px;height: 24px;"></i></span><input class="form-control"
+                                                                                        name="phone"
+                                                                                        value="<?php echo $user->phone; ?>"
                                                                                         type="number"
                                                                                         style="height: 70px;background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
                                                                                         placeholder="Телефон"
@@ -145,6 +161,7 @@ if(isset($data['profile']))
                                                                                         type="email"
                                                                                         style="height: 70px;background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
                                                                                         placeholder="Email"
+                                                                                        name="email";
                                                                                         value="<?php echo $user->email; ?>"
                                                                                         required="">
                         <button class="btn btn-primary d-xl-flex align-items-xl-center" type="button"
@@ -173,7 +190,7 @@ if(isset($data['profile']))
                                     <circle cx="7" cy="17" r="2"></circle>
                                     <circle cx="17" cy="17" r="2"></circle>
                                     <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"></path>
-                                </svg></span><input class="form-control d-lg-flex" type="text"
+                                </svg></span><input class="form-control d-lg-flex" type="text" name="car" value="<?php echo $user->car; ?>"
                                                     style="height: 70px;background: #ffffff;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-style: none;border-right-color: rgb(255,255,255);border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: rgba(255,255,255,0);"
                                                     placeholder="Машина">
                         <button class="btn btn-primary d-xl-flex align-items-xl-center" type="button"
@@ -216,7 +233,7 @@ if(isset($data['profile']))
                                     style="width: 24px;height: 24px;margin-left: -7px;padding-top: 0px;padding-right: 0px;">
                                     <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"></path>
                                     <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"></path>
-                                </svg></span><input class="form-control" type="password"
+                                </svg></span><input class="form-control" type="password" name="lastpassword"
                                                     style="height: 70px;background: #ffffff;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-style: none;border-right-color: rgb(255,255,255);border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: rgba(255,255,255,0);"
                                                     placeholder="Пароль">
                         <button class="btn btn-primary d-flex d-sm-flex d-md-flex d-xl-flex align-items-center align-items-sm-center align-items-md-center align-items-xl-center"
@@ -241,7 +258,7 @@ if(isset($data['profile']))
                                     style="width: 24px;height: 24px;margin-left: -7px;padding-top: 0px;padding-right: 0px;">
                                     <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"></path>
                                     <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"></path>
-                                </svg></span><input class="form-control" type="password"
+                                </svg></span><input class="form-control" type="password" name="newpassword"
                                                     style="height: 70px;background: #ffffff;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-style: none;border-right-color: rgb(255,255,255);border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: rgba(255,255,255,0);"
                                                     placeholder="Новый пароль">
                         <button class="btn btn-primary d-flex d-sm-flex d-md-flex d-xl-flex align-items-center align-items-sm-center align-items-md-center align-items-xl-center"
@@ -255,7 +272,7 @@ if(isset($data['profile']))
                             </svg>
                         </button>
                     </div>
-                    <button class="btn btn-primary" name= "profile" type="submit"
+                    <button class="btn btn-primary" name="profile" type="submit"
                             style="margin-top: 50px;background: #5f2eea;width: 296px;height: 64px;border-radius: 40px;padding: 0px;padding-left: 0px;padding-bottom: 1px;">
                         Сохранить
                     </button>

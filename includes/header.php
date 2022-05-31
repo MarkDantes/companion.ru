@@ -45,8 +45,12 @@
             </ul>
             <div class="dropdown">
                 <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="assets/img/avatars/<?php echo R::findOne('users','id = ?', array($_SESSION['logged_user']->id))->avatar;?>" alt="mdo" width="48" height="48" class="rounded-circle">
+                   data-bs-toggle="dropdown" aria-expanded="false"> <?php if(isset($_SESSION['logged_user'])) : ?>
+                        <img src="assets/img/avatars/<?php echo R::findOne('users','id = ?', array($_SESSION['logged_user']->id))->avatar;?>" alt="mdo" width="48" height="48" class="rounded-circle">
+                    <?php else: ?>
+                        <img src="assets/img/avatars/avatar.jpg" alt="mdo" width="48" height="48" class="rounded-circle">
+                    <?php endif; ?>
+
                 </a>
                 <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
                     <?php if (isset($_SESSION['logged_user'])) : ?>
