@@ -1,78 +1,30 @@
 <?php
-require "db.php";
-include "element.php";
-if (!isset($_SESSION['logged_user'])) {
-    header("Location: /login.php");
+
+function printPassengers($pass)
+{
+
 }
 
+function printElement($trip)
+{
+    foreach ($trip as $item) {
 
-$data = $_POST;
-$user = R::findOne('users', 'id = ?', array($_SESSION['logged_user']->id));
-$tripsDriver = R::find("trips", "driver = ?", array($user->person));
-$tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>History - Companion</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=ABeeZee">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins&amp;display=swap">
-    <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css">
-    <link rel="stylesheet" href="assets/fonts/line-awesome.min.css">
-    <link rel="stylesheet" href="assets/fonts/material-icons.min.css">
-    <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand.css">
-    <link rel="stylesheet" href="assets/css/Toggle-Switch-2.css">
-</head>
-
-<body style="--bs-body-bg: #f7f7fc;">
-<!--Header-->
-<?php include("includes/header.php"); ?>
-
-<section class="py-5 mt-5" style="--bs-body-bg: #f7f7fc;background: #f7f7fc;">
-    <div class="container py-5">
-        <div class="row d-flex d-xl-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center align-items-xl-center"
-             style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
-            <div class="col-xl-11 offset-xl-0 d-flex d-xl-flex flex-column align-items-center align-items-sm-center align-items-xl-center"
-                 style="--bs-body-bg: #f7f7fc;background: #ffffff;width: 480px;height: 920px;border-radius: 32px;font-family: Poppins, sans-serif;box-shadow: 0px 8px 16px rgba(17,17,17,0.04);padding: 0px;">
-                <div class="d-flex justify-content-xl-center align-items-xl-start"
-                     style="height: 55px;margin-bottom: 19px;margin-top: 25px;background: rgba(54,162,177,0);--bs-body-font-weight: 900;font-family: Poppins, sans-serif;">
-                    <div class="d-flex flex-column justify-content-xxl-end"><a href="profile.php"
-                                                                               style="margin-left: 0px;margin-right: 100px;font-size: 32px;font-family: Poppins, sans-serif;transform-style: preserve-3d;font-weight: bold;color: #14142b;width: 150px;height: 50px;">Профиль</a>
-                    </div>
-                    <div class="d-flex flex-column justify-content-xxl-center align-items-xxl-start"><a
-                                href="history.php"
-                                style="font-size: 32px;transform-style: preserve-3d;font-weight: bold;color: #14142b;">История</a>
-                        <hr style="margin: 0px;margin-top: 0px;width: 80px;height: 3px;color: #5f2eea;margin-bottom: 0px;margin-left: 34px;border-radius: 2px;">
-                    </div>
-                </div>
-                <?php printElement($tripsDriver);  ?>
-                <!--element
-                <div class="d-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
+        echo '<div class="d-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
                      style="box-shadow: 5px 5px 2px rgba(0,0,0,0.25);border-radius: 32px;width: 445px;height: 115px;font-family: Poppins, sans-serif;">
                     <div class="d-flex flex-column"><input class="d-flex d-xxl-flex" type="text" readonly=""
                                                            style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                           value="355 ₽"><input class="d-flex" type="text" readonly=""
+                                                           value="'.$item->price.'₽"><input class="d-flex" type="text" readonly=""
                                                                                 style="color: #6e7191;height: 30px;width: 112px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;"
-                                                                                value="23 Февраля"></div>
-                    <input class="d-flex d-xxl-flex" type="text" readonly="" value="Забронировано"
+                                                                                value="'.$item->data.'"></div>
+                    <input class="d-flex d-xxl-flex" type="text" readonly="" value="Cоздано"
                            style="width: 130px;height: 30px;font-family: Poppins, sans-serif;font-size: 15px;color: #14142b;font-weight: bold;padding: 0px;margin-left: 40px;margin-right: 60px;border-style: none;"><a
                             class="btn btn-primary d-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center"
                             role="button"
                             style="border-width: 3px;border-color: #5f2eea;background: #ffffff;width: 55px;height: 55px;border-radius: 80px;color: #5f2eea;font-size: 25px;padding: 0px;padding-top: 0px;"
-                            href="#modal-1" data-bs-target="#modal-1" data-bs-toggle="modal">&gt;</a>-->
+                            href="#modal-'.$item->id.'" data-bs-target="#modal-'.$item->id.'" data-bs-toggle="modal">&gt;</a>
 
-                    <!--Modal window with information about trip for history
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+                    
+                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-'.$item->id.'">
                         <div class="modal-dialog modal-lg" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -91,11 +43,11 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                              style="margin-bottom: 10px;">
                                             <div class="d-flex d-xxl-flex flex-row align-items-xxl-center"
                                                  style="margin: 10px;margin-top: 10px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 0px;">
-                                                <input type="text" value="Вятская 114" autocomplete="on" readonly=""
+                                                <input type="text" value="'.$item->start.'" autocomplete="on" readonly=""
                                                        style="border-style: none;font-weight: bold;width: 123.6px;"><i
                                                         class="la la-long-arrow-right"
                                                         style="margin-left: 9px;margin-right: 10px;width: 24px;height: 24px;color: #5f2eea;margin-top: 6px;"></i><input
-                                                        class="flex-shrink-1" type="text" value="Новолесная 1"
+                                                        class="flex-shrink-1" type="text" value="'.$item->end.'"
                                                         style="border-style: none;font-weight: bold;width: 128.6px;"
                                                         readonly=""></div>
                                             <div class="d-flex flex-column align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
@@ -103,14 +55,14 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                                 <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
                                                      style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
                                                             class="rounded-circle d-flex d-xl-flex"
-                                                            src="assets/img/avatars/avatar.jpg" width="60px"
+                                                            src="assets/img/avatars/'.$item->avatar.'" width="60px"
                                                             height="60px"
                                                             style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;margin: 0px;margin-left: 0px;">
                                                     <p style="font-size: 12px;margin: 0px;margin-top: 0px;margin-left: 20px;"></p>
                                                     <input class="d-flex d-xl-flex flex-shrink-1" type="text"
                                                            style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
-                                                           placeholder="Имя Фамилия" autocomplete="on"
-                                                           inputmode="latin-name" readonly="">
+                                                           placeholder="Имя Фамилия" value="'.$item->driver.'" autocomplete="on"
+                                                            readonly="">
                                                 </div>
                                                 <div class="input-group d-flex d-xl-flex align-content-center"
                                                      style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 325px;height: 57px;margin-top: 30px;margin-bottom: 0px;background: rgba(239,240,246,0);border-color: rgb(45, 45, 45);"><span
@@ -130,7 +82,7 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                                             </svg></span><input class="form-control d-lg-flex"
                                                                                 type="text"
                                                                                 style="height: 70px;background: #ffffff;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-style: none;border-right-color: rgb(255,255,255);border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: rgba(255,255,255,0);"
-                                                                                placeholder="Машина" readonly=""
+                                                                                placeholder="Машина" value="'.$item->car.'" readonly=""
                                                                                 autocomplete="on">
                                                     <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
                                                             type="button"
@@ -145,7 +97,7 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                                                 style="width: 24px;height: 24px;"></i></span><input
                                                             class="form-control" type="number"
                                                             style="height: 70px;background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
-                                                            placeholder="Телефон" readonly="">
+                                                            placeholder="Телефон" value ="'.$item->phone.'" readonly="">
                                                     <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
                                                             type="button"
                                                             style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 70px;padding: 0px;margin-left: 0px;width: 47px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;"
@@ -158,23 +110,23 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                                  style="margin-top: 10px;"><input class="d-flex d-xxl-flex" type="text"
                                                                                   readonly=""
                                                                                   style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                                                  value="355 ₽"><input class="d-flex"
+                                                                                  value="'.$item->price.'₽"><input class="d-flex"
                                                                                                        type="text"
                                                                                                        readonly=""
                                                                                                        style="color: #6e7191;height: 30px;width: 191px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;margin-left: 20px;"
-                                                                                                       value="15:30, 23 Февраля">
+                                                                                                       value="'.$item->data.'">
                                             </div>
                                             <div class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
                                                  style="background: #eff0f6;padding: 15px;padding-bottom: 15px;padding-left: 20px;border-radius: 32px;">
                                                 <input type="text" readonly="" autocomplete="on"
                                                        style="border-style: none;background: rgba(255,255,255,0);margin-top: 0px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                       value="Можно с животными"><input type="text"
-                                                                                        value="Сзади 2 места"
+                                                       '.(($item->animal >0)? 'value="Можно с животными"' : 'value="Нельзя с животными"').'><input type="text"
+                                                                                        '.(($item->seats >0)? 'value="Сзади 2 места"' : 'value="Сзади 3 места"').'
                                                                                         readonly="" autocomplete="on"
                                                                                         style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"><input
-                                                        type="text" value="Есть детское кресло" readonly=""
+                                                        type="text" '.(($item->baby >0)? 'value="Есть детское кресло"' : 'value="Нет детского кресла"').' readonly=""
                                                         style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                        autocomplete="on"><input type="text" value="Курить нельзя"
+                                                        autocomplete="on"><input type="text" '.(($item->smoke >0)? 'value="Можно курить"' : 'value="Курить нельзя"').'
                                                                                  readonly="" autocomplete="on"
                                                                                  style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;">
                                                 <p style="margin-bottom: 0px;margin-top: 12px;margin-right: 124px;font-weight: bold;font-family: Poppins, sans-serif;"></p>
@@ -191,8 +143,8 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                                             class="btn btn-primary d-xl-flex align-items-xl-center justify-content-xxl-center"
                                                             role="button"
                                                             style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 24px;padding: 0px;margin-left: 0px;width: 24px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;font-weight: bold;"
-                                                            data-bs-target="#modal-2" data-bs-toggle="modal"
-                                                            href="#modal-2"><i class="la la-info-circle"
+                                                            data-bs-target="#modal-2-'.$item->id.'" data-bs-toggle="modal"
+                                                            href="#modal-2-'.$item->id.'"><i class="la la-info-circle"
                                                                                style="color: #14142b;font-weight: bold;"></i>
                                                     </a></div>
                                             </div>
@@ -206,10 +158,10 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                 </div>
                             </div>
                         </div>
-                    </div>-->
+                    </div>
 
-                    <!--Modal window with information about passengers on the trip
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
+                    
+                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-2-'.$item->id.'">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -218,6 +170,7 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                                             aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
+                                <!--Passenger-->
                                     <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
                                          style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
                                                 class="rounded-circle d-flex d-xl-flex"
@@ -234,18 +187,7 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
                             </div>
                         </div>
                     </div>
-                </div>-->
-            </div>
-        </div>
-    </div>
-</section>
-
-<!--Footer-->
-<?php include("includes/footer.php"); ?>
-
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/bootstrap/js/bootstrap.min.js"></script>
-<script src="assets/js/bold-and-bright.js"></script>
-</body>
-
-</html>
+                </div>';
+    }
+return true;
+}

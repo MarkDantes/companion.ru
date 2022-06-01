@@ -14,37 +14,38 @@ if (isset($data['create'])) {
 
     $trip = R::dispense('trips');
     $trip->driver = $user->person;
+    $trip->avatar = $user->avatar;
+    $trip->phone = $user->phone;
     $trip->car = $user->car;
     $trip->start = $data['start'];
     $trip->end = $data['end'];
     $trip->stops = $data['stops'];
     $trip->data = $data['data'];
     $trip->price = $data['price'];
+    $trip->passenger=null;
 
-    if ( isset($_POST['animal']) == true ) {
+
+    //filter
+    if (isset($_POST['animal']) == true) {
         $trip->animal = true;
-    } else
-    {
+    } else {
         $trip->animal = false;
     }
-    if ( isset($_POST['seats']) == true ) {
+    if (isset($_POST['seats']) == true) {
         $trip->seats = true;
-    } else
-    {
-        $trip->seats= false;
+    } else {
+        $trip->seats = false;
     }
 
-    if ( isset($_POST['baby']) == true ) {
+    if (isset($_POST['baby']) == true) {
         $trip->baby = true;
-    } else
-    {
-        $trip->baby= false;
+    } else {
+        $trip->baby = false;
     }
-    if ( isset($_POST['smoke']) == true ) {
+    if (isset($_POST['smoke']) == true) {
         $trip->smoke = true;
-    } else
-    {
-        $trip->smoke= false;
+    } else {
+        $trip->smoke = false;
     }
 
     R::store($trip);
@@ -90,7 +91,8 @@ if (isset($data['create'])) {
             <div class="col d-flex d-md-flex flex-column justify-content-center align-items-center m-auto justify-content-sm-center align-items-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center">
 
                 <!--form with trip's settings-->
-                <form action="create.php" method="post" class="d-flex flex-column justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xl-center align-items-xl-center"
+                <form action="create.php" method="post"
+                      class="d-flex flex-column justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xl-center align-items-xl-center"
                       style="margin-left: 0px;margin-bottom: 35px;border-right-color: #ffffff;border-left-color: #ffffff;font-family: Poppins, sans-serif;font-size: 18px;margin-top: 15px;">
                     <div class="row">
                         <div class="col d-flex d-md-flex flex-column justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center">
@@ -206,7 +208,8 @@ if (isset($data['create'])) {
                                      style="width: 285px;height: 65px;margin-top: 30px;margin-left: 65px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                                     <label class="form-label d-flex d-xxl-flex"
                                            style="margin-right: 15px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Можно
-                                        с животными</label><label class="switch"><input name="animal" type="checkbox"/><span
+                                        с животными</label><label class="switch"><input name="animal"
+                                                                                        type="checkbox"/><span
                                                 class="slider round"></span></label></div>
 
                                 <!--2 seats-->
