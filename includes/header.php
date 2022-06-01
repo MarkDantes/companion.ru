@@ -31,6 +31,7 @@
                         <a class="dropdown-item" href="#">Воронеж</a>
                         <a class="dropdown-item" href="#">Пермь</a>
                         <a class="dropdown-item" href="#">Волгоград</a>
+                        <a class="dropdown-item" href="#">Краснодар</a>
                     </div>
                 </li>
                 <li class="nav-item"><a class="nav-link fw-bolder" href="index.php"
