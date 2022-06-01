@@ -43,7 +43,7 @@ $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
         <div class="row d-flex d-xl-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center align-items-xl-center"
              style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
             <div class="col-xl-11 offset-xl-0 d-flex d-xl-flex flex-column align-items-center align-items-sm-center align-items-xl-center"
-                 style="--bs-body-bg: #f7f7fc;background: #ffffff;width: 480px;height: 920px;border-radius: 32px;font-family: Poppins, sans-serif;box-shadow: 0px 8px 16px rgba(17,17,17,0.04);padding: 0px;">
+                 style="--bs-body-bg: #f7f7fc;background: #ffffff;width: 480px;border-radius: 32px;font-family: Poppins, sans-serif;box-shadow: 0px 8px 16px rgba(17,17,17,0.04);padding: 0px;">
                 <div class="d-flex justify-content-xl-center align-items-xl-start"
                      style="height: 55px;margin-bottom: 19px;margin-top: 25px;background: rgba(54,162,177,0);--bs-body-font-weight: 900;font-family: Poppins, sans-serif;">
                     <div class="d-flex flex-column justify-content-xxl-end"><a href="profile.php"

@@ -10,7 +10,7 @@ function printElement($trip)
     foreach ($trip as $item) {
 
         echo '<div class="d-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
-                     style="box-shadow: 5px 5px 2px rgba(0,0,0,0.25);border-radius: 32px;width: 445px;height: 115px;font-family: Poppins, sans-serif;">
+                     style="box-shadow: 5px 5px 2px rgba(0,0,0,0.25);border-radius: 32px;width: 445px;height: 115px;font-family: Poppins, sans-serif;margin-bottom: 30px;">
                     <div class="d-flex flex-column"><input class="d-flex d-xxl-flex" type="text" readonly=""
                                                            style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
                                                            value="'.$item->price.'₽"><input class="d-flex" type="text" readonly=""
