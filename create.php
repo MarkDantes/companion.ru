@@ -78,6 +78,7 @@ if (isset($data['create'])) {
     <link rel="stylesheet" href="assets/fonts/material-icons.min.css">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand.css">
     <link rel="stylesheet" href="assets/css/Toggle-Switch-2.css">
+
 </head>
 
 <body style="/*background: url(&quot;design.jpg&quot;);*/background-position: 0 -60px;">

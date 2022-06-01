@@ -1,5 +1,77 @@
 <?php
 require "db.php";
+require "libs/dadata.php";
+include "findelement.php";
+include "distance.php";
+
+$data = $_POST;
+$token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
+$secret = "2db57c4bf885349d4f342858fb8e1de2faf7d81f";
+
+$trips = R::find("trips");
+
+//Проверяем, чтоб расстояние было меньше 1.5км от точек поиска до точек маршрута
+function trip($trips)
+{
+    $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
+    $dadata = new Dadata($token, null);
+    $dadata->init();
+    $filter = array();
+    foreach ($trips as $item) {
+
+        $fieldsOne = array("query" => $item->start, "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+        $resultOne = $dadata->suggest("address", $fieldsOne);
+        $fieldsTwo = array("query" => $item->end, "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+        $resultTwo = $dadata->suggest("address", $fieldsTwo);
+
+
+        $d1 = distance($resultOne["suggestions"][0]["data"]["geo_lat"], $resultOne["suggestions"][0]["data"]["geo_lon"], $_SESSION['last_search']->start_lat, $_SESSION['last_search']->start_lon);
+        $d2 = distance($resultTwo["suggestions"][0]["data"]["geo_lat"], $resultTwo["suggestions"][0]["data"]["geo_lon"], $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
+
+        if ($d1 < 1500 && $d2 < 1500) {
+            array_push($filter, $item);
+        }
+
+    }
+    $dadata->close();
+    return $filter;
+
+}
+
+if (isset($data['find'])) {
+//Ищем поездку
+
+    unset($_SESSION['last_search']);
+
+    $dadata = new Dadata($token, null);
+    $dadata->init();
+    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+    $resultOne = $dadata->suggest("address", $fieldsOne);
+    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+    $resultTwo = $dadata->suggest("address", $fieldsTwo);
+
+    $find = R::findOne('finds', 'id = ?', array($_SESSION['last_search']->id));
+    $find->startLat = $resultOne["suggestions"][0]["data"]["geo_lat"];
+    $find->startLon = $resultOne["suggestions"][0]["data"]["geo_lon"];
+    $find->endLat = $resultTwo["suggestions"][0]["data"]["geo_lat"];
+    $find->endLon = $resultTwo["suggestions"][0]["data"]["geo_lon"];
+    $find->date = $data['date'];
+    $dadata->close();
+    R::store($find);
+
+    $_SESSION['last_search'] = $find;
+
+
+}
+
+if (isset($data['booking'])) {
+
+    $passenger = R::dispense('passengers');
+    $passenger->tripid = $data['booking'];
+    $passenger->passid = $_SESSION['logged_user']->id;
+    R::store($passenger);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -22,6 +94,8 @@ require "db.php";
     <link rel="stylesheet" href="assets/fonts/material-icons.min.css">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand.css">
     <link rel="stylesheet" href="assets/css/Toggle-Switch-2.css">
+
+
 </head>
 
 <body style="/*background: url(&quot;design.jpg&quot;);*/background-position: 0 -60px;">
@@ -50,7 +124,7 @@ require "db.php";
                                           fill="currentColor"></path>
                                 </svg></span><input class="form-control" type="text"
                                                     style="border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
-                                                    placeholder="Откуда" required="">
+                                                    placeholder="Откуда" name="start" required="">
                         <button class="btn btn-primary" type="button"
                                 style="background: #ffffff;border-top-right-radius: 16px;border-bottom-right-radius: 16px;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;padding-left: 30px;height: 46.8px;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
@@ -60,6 +134,8 @@ require "db.php";
                             </svg>
                         </button>
                     </div>
+
+
                     <div class="input-group justify-content-center align-items-center align-content-center flex-wrap m-auto"
                          style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 300px;height: 55px;margin: 0px;margin-top: 0px;margin-bottom: 0px;font-family: Poppins, sans-serif;margin-left: 0px;">
                         <span class="input-group-text"
@@ -68,6 +144,7 @@ require "db.php";
                                     style="width: 24px;height: 24px;">location_on</i></span><input class="form-control"
                                                                                                    type="text"
                                                                                                    style="border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;height: 46.8px;"
+                                                                                                   name="end"
                                                                                                    placeholder="Куда"
                                                                                                    required="">
                         <button class="btn btn-primary" type="button"
@@ -79,7 +156,7 @@ require "db.php";
                             </svg>
                         </button>
                     </div>
-                    <input class="form-control d-xxl-flex flex-wrap m-auto" type="date" required=""
+                    <input class="form-control d-xxl-flex flex-wrap m-auto" type="date" name="date" required=""
                            style="width: 300px;height: 55px;margin-top: 0px;border-color: #14142b;border-bottom-color: #14142b;padding-right: 30px;padding-left: 31px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 10px;margin-left: 0px;">
                     <button class="btn btn-primary d-flex d-xxl-flex justify-content-center align-items-center m-auto justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xxl-center align-items-xxl-center"
                             type="submit"
@@ -91,401 +168,61 @@ require "db.php";
         </div>
     </div>
 
-    <!-- -->
     <div class="container">
         <div class="row d-md-flex justify-content-md-center">
             <div class="col-lg-8 col-xl-9 col-xxl-9 d-flex flex-column">
-                <div class="d-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
-                     style="box-shadow: 5px 5px 2px rgba(0,0,0,0.25);border-radius: 32px;font-family: Poppins, sans-serif;height: 115px;background: #ffffff;">
-                    <div class="text-center d-flex flex-column flex-wrap align-items-sm-center justify-content-xl-center justify-content-xxl-start"
-                         style="margin-bottom: 0px;margin-top: 0px;margin-right: 40px;"><img
-                                class="rounded-circle d-flex d-xl-flex" src="assets/img/avatars/avatar.jpg" width="60px"
-                                height="60px"
-                                style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;margin: 0px;margin-left: 0px;">
-                        <p style="font-size: 12px;margin: 0px;margin-top: 0px;margin-left: 20px;"></p><input
-                                class="d-flex d-xl-flex flex-shrink-1" type="text"
-                                style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 110px;height: 30px;"
-                                placeholder="Имя Фамилия" autocomplete="on" inputmode="latin-name" readonly="">
-                    </div>
-                    <div class="d-flex d-xxl-flex flex-row flex-wrap align-items-xxl-center"
-                         style="margin: 10px;margin-top: 10px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 40px;">
-                        <input type="text" value="Вятская 114" autocomplete="on" readonly=""
-                               style="border-style: none;font-weight: bold;width: 123.6px;"><i
-                                class="la la-long-arrow-right"
-                                style="margin-left: 9px;margin-right: 10px;width: 24px;height: 24px;color: #5f2eea;margin-top: 6px;"></i><input
-                                class="flex-shrink-1" type="text" value="Новолесная 1"
-                                style="border-style: none;font-weight: bold;width: 128.6px;" readonly=""></div>
-                    <div class="d-flex flex-column" style="margin-right: 30px;"><input class="d-flex d-xxl-flex"
-                                                                                       type="text" readonly=""
-                                                                                       style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                                                       value="355 ₽"><input
-                                class="d-flex" type="text" readonly=""
-                                style="color: #6e7191;height: 30px;width: 112px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;"
-                                value="23 Февраля"></div>
-                    <button class="btn btn-primary d-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center"
-                            type="button"
-                            style="border-width: 3px;border-color: #5f2eea;background: #ffffff;width: 55px;height: 55px;border-radius: 80px;color: #5f2eea;font-size: 25px;padding: 0px;padding-top: 0px;"
-                            data-bs-target="#modal-3" data-bs-toggle="modal">&gt;
-                    </button>
-                    <!--Modal window with information about trip for history-->
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
-                        <div class="modal-dialog modal-lg" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title"
-                                        style="color: #14142b;font-size: 32px;font-weight: bold;font-family: Poppins, sans-serif;">
-                                        Детали поездки</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body d-flex d-xxl-flex flex-column align-items-xxl-center">
-                                    <iframe allowfullscreen="" frameborder="0" loading="lazy"
-                                            src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&amp;origin=%D0%92%D1%8F%D1%82%D1%81%D0%BA%D0%B0%D1%8F+114&amp;destination=%D0%9D%D0%BE%D0%B2%D0%BE%D0%BB%D0%B5%D1%81%D0%BD%D0%B0%D1%8F+1&amp;zoom=12"
-                                            width="100%" height="400" style="border-radius: 32px;"></iframe>
-                                    <div class="row d-flex flex-row justify-content-xl-center" style="margin: 0px;">
-                                        <div class="col-md-12 col-lg-6 col-xl-5 col-xxl-7 offset-xl-0 offset-xxl-0 d-flex d-xxl-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-xxl-center"
-                                             style="margin-bottom: 10px;">
-                                            <div class="d-flex d-xxl-flex flex-row align-items-xxl-center"
-                                                 style="margin: 10px;margin-top: 10px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 0px;">
-                                                <input type="text" value="Вятская 114" autocomplete="on" readonly=""
-                                                       style="border-style: none;font-weight: bold;width: 123.6px;"><i
-                                                        class="la la-long-arrow-right"
-                                                        style="margin-left: 9px;margin-right: 10px;width: 24px;height: 24px;color: #5f2eea;margin-top: 6px;"></i><input
-                                                        class="flex-shrink-1" type="text" value="Новолесная 1"
-                                                        style="border-style: none;font-weight: bold;width: 128.6px;"
-                                                        readonly=""></div>
-                                            <div class="d-flex flex-column align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
-                                                 style="margin-top: 10px;margin-right: 0px;">
-                                                <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
-                                                     style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
-                                                            class="rounded-circle d-flex d-xl-flex"
-                                                            src="assets/img/avatars/avatar.jpg" width="60px"
-                                                            height="60px"
-                                                            style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;margin: 0px;margin-left: 0px;">
-                                                    <p style="font-size: 12px;margin: 0px;margin-top: 0px;margin-left: 20px;"></p>
-                                                    <input class="d-flex d-xl-flex flex-shrink-1" type="text"
-                                                           style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
-                                                           placeholder="Имя Фамилия" autocomplete="on"
-                                                           inputmode="latin-name" readonly="">
-                                                </div>
-                                                <div class="input-group d-flex d-xl-flex align-content-center"
-                                                     style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 325px;height: 57px;margin-top: 30px;margin-bottom: 0px;background: rgba(239,240,246,0);border-color: rgb(45, 45, 45);"><span
-                                                            class="d-flex d-xl-flex flex-row align-items-lg-center justify-content-xl-center align-items-xl-center input-group-text"
-                                                            style="background: #ffffff;height: 70px;width: 45px;padding-top: 16.6px;padding-right: 0px;padding-left: 25px;border-width: 2px;border-color: #5f2eea;border-right-style: none;"><svg
-                                                                xmlns="http://www.w3.org/2000/svg" width="1em"
-                                                                height="1em" viewBox="0 0 24 24" stroke-width="2"
-                                                                stroke="currentColor" fill="none" stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                class="icon icon-tabler icon-tabler-car d-lg-flex justify-content-lg-center align-items-lg-end"
-                                                                style="width: 24px;height: 24px;margin-left: -7px;padding-top: 0px;padding-right: 0px;">
-                                                                <path stroke="none" d="M0 0h24v24H0z"
-                                                                      fill="none"></path>
-                                                                <circle cx="7" cy="17" r="2"></circle>
-                                                                <circle cx="17" cy="17" r="2"></circle>
-                                                                <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"></path>
-                                                            </svg></span><input class="form-control d-lg-flex"
-                                                                                type="text"
-                                                                                style="height: 70px;background: #ffffff;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-style: none;border-right-color: rgb(255,255,255);border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: rgba(255,255,255,0);"
-                                                                                placeholder="Машина" readonly=""
-                                                                                autocomplete="on">
-                                                    <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
-                                                            type="button"
-                                                            style="background: #ffffff;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 70px;padding: 0px;margin-left: 0px;width: 47px;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-color: #5F2EEA;border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: #ffffff;"
-                                                            disabled=""></button>
-                                                </div>
-                                                <div class="input-group d-flex d-xl-flex align-content-center"
-                                                     style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 325px;height: 57px;margin-top: 30px;margin-bottom: 0px;background: rgba(239,240,246,0);">
-                                                    <span class="d-flex d-xl-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xl-center align-items-xl-center input-group-text"
-                                                          style="background: #eff0f6;height: 70px;width: 45px;padding-top: 16.6px;padding-right: 13px;padding-left: 25px;border-style: none;border-top-color: #14142b;border-bottom-color: #14142b;border-left-color: #14142b;"><i
-                                                                class="fas fa-mobile-alt d-lg-flex align-items-lg-center"
-                                                                style="width: 24px;height: 24px;"></i></span><input
-                                                            class="form-control" type="number"
-                                                            style="height: 70px;background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
-                                                            placeholder="Телефон" readonly="">
-                                                    <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
-                                                            type="button"
-                                                            style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 70px;padding: 0px;margin-left: 0px;width: 47px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;"
-                                                            disabled=""></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-xl-6 col-xxl-5 d-flex d-xl-flex d-xxl-flex flex-column align-items-center align-items-xxl-center">
-                                            <div class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center"
-                                                 style="margin-top: 10px;"><input class="d-flex d-xxl-flex" type="text"
-                                                                                  readonly=""
-                                                                                  style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                                                  value="355 ₽"><input class="d-flex"
-                                                                                                       type="text"
-                                                                                                       readonly=""
-                                                                                                       style="color: #6e7191;height: 30px;width: 191px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;margin-left: 20px;"
-                                                                                                       value="15:30, 23 Февраля">
-                                            </div>
-                                            <div class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
-                                                 style="background: #eff0f6;padding: 15px;padding-bottom: 15px;padding-left: 20px;border-radius: 32px;">
-                                                <input type="text" readonly="" autocomplete="on"
-                                                       style="border-style: none;background: rgba(255,255,255,0);margin-top: 0px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                       value="Можно с животными"><input type="text"
-                                                                                        value="Сзади 2 места"
-                                                                                        readonly="" autocomplete="on"
-                                                                                        style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"><input
-                                                        type="text" value="Есть детское кресло" readonly=""
-                                                        style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                        autocomplete="on"><input type="text" value="Курить нельзя"
-                                                                                 readonly="" autocomplete="on"
-                                                                                 style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;">
-                                                <p style="margin-bottom: 0px;margin-top: 12px;margin-right: 124px;font-weight: bold;font-family: Poppins, sans-serif;"></p>
-                                                <div class="input-group d-flex d-xl-flex flex-row align-content-center justify-content-xxl-center align-items-xxl-center"
-                                                     style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;margin-top: 0px;margin-bottom: 0px;background: rgba(239,240,246,0);height: 44px;width: 202.575px;">
-                                                    <span class="d-flex d-xl-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xl-center align-items-xl-center justify-content-xxl-center input-group-text"
-                                                          style="background: #eff0f6;padding: 9.6px 13px 9.6px;border-style: none;border-top-color: #14142b;border-bottom-color: #14142b;border-left-color: #14142b;width: 35px;"><i
-                                                                class="la la-user d-lg-flex align-items-lg-center justify-content-xxl-center"
-                                                                style="height: 24px;font-weight: bold;width: 24px;padding-left: 7px;padding-top: 2px;"></i></span><input
-                                                            class="form-control d-flex d-xxl-flex flex-wrap justify-content-xxl-start align-items-xxl-center"
-                                                            type="text"
-                                                            style="background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;padding-right: 0px;padding-bottom: 7.6px;padding-top: 8.6px;color: #6f6c90;font-weight: bold;width: 107px;"
-                                                            readonly="" value="Занято: 2/3 "><a
-                                                            class="btn btn-primary d-xl-flex align-items-xl-center justify-content-xxl-center"
-                                                            role="button"
-                                                            style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 24px;padding: 0px;margin-left: 0px;width: 24px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;font-weight: bold;"
-                                                            data-bs-target="#modal-2" data-bs-toggle="modal"
-                                                            href="#modal-2"><i class="la la-info-circle"
-                                                                               style="color: #14142b;font-weight: bold;"></i>
-                                                    </a></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center align-items-xxl-center">
-                                    <button class="btn btn-primary" type="button"
-                                            style="background: #5f2eea;width: 200px;height: 55px;">Удалить
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--Modal window with information about passengers on the trip-->
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-2">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title">Пассажиры</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
-                                         style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
-                                                class="rounded-circle d-flex d-xl-flex"
-                                                src="assets/img/avatars/avatar.jpg" width="60px" height="60px"
-                                                style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;margin: 0px;margin-left: 0px;">
-                                        <p style="font-size: 12px;margin: 0px;margin-top: 0px;margin-left: 20px;"></p>
-                                        <input class="d-flex d-xl-flex flex-shrink-1" type="text"
-                                               style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
-                                               placeholder="Имя Фамилия" autocomplete="on" inputmode="latin-name"
-                                               readonly="">
-                                    </div>
-                                </div>
-                                <div class="modal-footer"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--Modal window with information about trip for booking-->
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-3">
-                        <div class="modal-dialog modal-lg" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title"
-                                        style="color: #14142b;font-size: 32px;font-weight: bold;font-family: Poppins, sans-serif;">
-                                        Детали поездки</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body d-flex d-xxl-flex flex-column align-items-xxl-center">
-                                    <iframe allowfullscreen="" frameborder="0" loading="lazy"
-                                            src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&amp;origin=%D0%92%D1%8F%D1%82%D1%81%D0%BA%D0%B0%D1%8F+114&amp;destination=%D0%9D%D0%BE%D0%B2%D0%BE%D0%BB%D0%B5%D1%81%D0%BD%D0%B0%D1%8F+1&amp;zoom=12"
-                                            width="100%" height="400" style="border-radius: 32px;"></iframe>
-                                    <div class="row d-flex flex-row justify-content-xl-center" style="margin: 0px;">
-                                        <div class="col-md-12 col-lg-6 col-xl-5 col-xxl-7 offset-xl-0 offset-xxl-0 d-flex d-xxl-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-xxl-center"
-                                             style="margin-bottom: 10px;">
-                                            <div class="d-flex d-xxl-flex flex-row align-items-xxl-center"
-                                                 style="margin: 10px;margin-top: 10px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 0px;">
-                                                <input type="text" value="Вятская 114" autocomplete="on" readonly=""
-                                                       style="border-style: none;font-weight: bold;width: 123.6px;"><i
-                                                        class="la la-long-arrow-right"
-                                                        style="margin-left: 9px;margin-right: 10px;width: 24px;height: 24px;color: #5f2eea;margin-top: 6px;"></i><input
-                                                        class="flex-shrink-1" type="text" value="Новолесная 1"
-                                                        style="border-style: none;font-weight: bold;width: 128.6px;"
-                                                        readonly=""></div>
-                                            <div class="d-flex flex-column align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
-                                                 style="margin-top: 10px;margin-right: 0px;">
-                                                <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
-                                                     style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
-                                                            class="rounded-circle d-flex d-xl-flex"
-                                                            src="assets/img/avatars/avatar.jpg" width="60px"
-                                                            height="60px"
-                                                            style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;margin: 0px;margin-left: 0px;">
-                                                    <p style="font-size: 12px;margin: 0px;margin-top: 0px;margin-left: 20px;"></p>
-                                                    <input class="d-flex d-xl-flex flex-shrink-1" type="text"
-                                                           style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
-                                                           placeholder="Имя Фамилия" autocomplete="on"
-                                                           inputmode="latin-name" readonly="">
-                                                </div>
-                                                <div class="input-group d-flex d-xl-flex align-content-center"
-                                                     style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 325px;height: 57px;margin-top: 30px;margin-bottom: 0px;background: rgba(239,240,246,0);border-color: rgb(45, 45, 45);"><span
-                                                            class="d-flex d-xl-flex flex-row align-items-lg-center justify-content-xl-center align-items-xl-center input-group-text"
-                                                            style="background: #ffffff;height: 70px;width: 45px;padding-top: 16.6px;padding-right: 0px;padding-left: 25px;border-width: 2px;border-color: #5f2eea;border-right-style: none;"><svg
-                                                                xmlns="http://www.w3.org/2000/svg" width="1em"
-                                                                height="1em" viewBox="0 0 24 24" stroke-width="2"
-                                                                stroke="currentColor" fill="none" stroke-linecap="round"
-                                                                stroke-linejoin="round"
-                                                                class="icon icon-tabler icon-tabler-car d-lg-flex justify-content-lg-center align-items-lg-end"
-                                                                style="width: 24px;height: 24px;margin-left: -7px;padding-top: 0px;padding-right: 0px;">
-                                                                <path stroke="none" d="M0 0h24v24H0z"
-                                                                      fill="none"></path>
-                                                                <circle cx="7" cy="17" r="2"></circle>
-                                                                <circle cx="17" cy="17" r="2"></circle>
-                                                                <path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5"></path>
-                                                            </svg></span><input class="form-control d-lg-flex"
-                                                                                type="text"
-                                                                                style="height: 70px;background: #ffffff;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-style: none;border-right-color: rgb(255,255,255);border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: rgba(255,255,255,0);"
-                                                                                placeholder="Машина" readonly=""
-                                                                                autocomplete="on">
-                                                    <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
-                                                            type="button"
-                                                            style="background: #ffffff;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 70px;padding: 0px;margin-left: 0px;width: 47px;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-color: #5F2EEA;border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: #ffffff;"
-                                                            disabled=""></button>
-                                                </div>
-                                                <div class="input-group d-flex d-xl-flex align-content-center"
-                                                     style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 325px;height: 57px;margin-top: 30px;margin-bottom: 0px;background: rgba(239,240,246,0);">
-                                                    <span class="d-flex d-xl-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xl-center align-items-xl-center input-group-text"
-                                                          style="background: #eff0f6;height: 70px;width: 45px;padding-top: 16.6px;padding-right: 13px;padding-left: 25px;border-style: none;border-top-color: #14142b;border-bottom-color: #14142b;border-left-color: #14142b;"><i
-                                                                class="fas fa-mobile-alt d-lg-flex align-items-lg-center"
-                                                                style="width: 24px;height: 24px;"></i></span><input
-                                                            class="form-control" type="number"
-                                                            style="height: 70px;background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
-                                                            placeholder="Телефон" readonly="">
-                                                    <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
-                                                            type="button"
-                                                            style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 70px;padding: 0px;margin-left: 0px;width: 47px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;"
-                                                            disabled=""></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-xl-6 col-xxl-5 d-flex d-xl-flex d-xxl-flex flex-column align-items-center align-items-xxl-center">
-                                            <div class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center"
-                                                 style="margin-top: 10px;"><input class="d-flex d-xxl-flex" type="text"
-                                                                                  readonly=""
-                                                                                  style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                                                  value="355 ₽"><input class="d-flex"
-                                                                                                       type="text"
-                                                                                                       readonly=""
-                                                                                                       style="color: #6e7191;height: 30px;width: 191px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;margin-left: 20px;"
-                                                                                                       value="15:30, 23 Февраля">
-                                            </div>
-                                            <div class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
-                                                 style="background: #eff0f6;padding: 15px;padding-bottom: 15px;padding-left: 20px;border-radius: 32px;">
-                                                <input type="text" readonly="" autocomplete="on"
-                                                       style="border-style: none;background: rgba(255,255,255,0);margin-top: 0px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                       value="Можно с животными"><input type="text"
-                                                                                        value="Сзади 2 места"
-                                                                                        readonly="" autocomplete="on"
-                                                                                        style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"><input
-                                                        type="text" value="Есть детское кресло" readonly=""
-                                                        style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                        autocomplete="on"><input type="text" value="Курить нельзя"
-                                                                                 readonly="" autocomplete="on"
-                                                                                 style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;">
-                                                <p style="margin-bottom: 0px;margin-top: 12px;margin-right: 124px;font-weight: bold;font-family: Poppins, sans-serif;"></p>
-                                                <div class="input-group d-flex d-xl-flex flex-row align-content-center justify-content-xxl-center align-items-xxl-center"
-                                                     style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;margin-top: 0px;margin-bottom: 0px;background: rgba(239,240,246,0);height: 44px;width: 202.575px;">
-                                                    <span class="d-flex d-xl-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xl-center align-items-xl-center justify-content-xxl-center input-group-text"
-                                                          style="background: #eff0f6;padding: 9.6px 13px 9.6px;border-style: none;border-top-color: #14142b;border-bottom-color: #14142b;border-left-color: #14142b;width: 35px;"><i
-                                                                class="la la-user d-lg-flex align-items-lg-center justify-content-xxl-center"
-                                                                style="height: 24px;font-weight: bold;width: 24px;padding-left: 7px;padding-top: 2px;"></i></span><input
-                                                            class="form-control d-flex d-xxl-flex flex-wrap justify-content-xxl-start align-items-xxl-center"
-                                                            type="text"
-                                                            style="background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;padding-right: 0px;padding-bottom: 7.6px;padding-top: 8.6px;color: #6f6c90;font-weight: bold;width: 107px;"
-                                                            readonly="" value="Занято: 2/3 "><a
-                                                            class="btn btn-primary d-xl-flex align-items-xl-center justify-content-xxl-center"
-                                                            role="button"
-                                                            style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 24px;padding: 0px;margin-left: 0px;width: 24px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;font-weight: bold;"
-                                                            data-bs-target="#modal-2" data-bs-toggle="modal"
-                                                            href="#modal-2"><i class="la la-info-circle"
-                                                                               style="color: #14142b;font-weight: bold;"></i>
-                                                    </a></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center align-items-xxl-center">
-                                    <button class="btn btn-primary" type="button"
-                                            style="background: #5f2eea;width: 200px;height: 55px;">Забронировать
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <?php printElementFind(trip($trips)); ?>
             </div>
             <div class="col-md-5 col-lg-4 col-xl-3 col-xxl-3 d-flex justify-content-center flex-wrap justify-content-sm-center">
-                <div class="d-flex flex-column justify-content-xxl-center align-items-xxl-center"
-                     style="margin-top: 0px;margin-bottom: 30px;width: 300px;">
+                <form class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
+                      method="post">
                     <div class="d-flex d-xxl-flex flex-row flex-grow-0 align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-flex d-xxl-flex"
                                style="margin-right: 15px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Можно
-                            с животными</label><label class="switch">
-                            <input type="checkbox">
-                            <span class="slider round"></span>
-                        </label></div>
-
+                            с животными</label><label class="switch"><input type="checkbox"/><span
+                                    class="slider round"></span></label></div>
                     <div class="d-flex d-xxl-flex align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-xxl-flex"
                                style="margin-right: 73px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Сзади
-                            2 места</label><label class="switch">
-                            <input type="checkbox">
-                            <span class="slider round"></span>
-                        </label></div>
-
+                            2 места</label><label class="switch"><input type="checkbox"/><span
+                                    class="slider round"></span></label></div>
                     <div class="d-flex d-xxl-flex align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-xxl-flex"
                                style="margin-right: 61px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Детское
-                            кресло</label><label class="switch">
-                            <input type="checkbox">
-                            <span class="slider round"></span>
-                        </label></div>
-
+                            кресло</label><label class="switch"><input type="checkbox"/><span
+                                    class="slider round"></span></label></div>
                     <div class="d-flex d-xxl-flex align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-xxl-flex"
                                style="margin-right: 39px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Курение
-                            в салоне</label><label class="switch">
-                            <input type="checkbox">
-                            <span class="slider round"></span>
-                        </label></div>
-
-                </div>
-                <div class="d-flex flex-row" style="margin-top: 5px;">
-                    <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
-                         style="margin-right: 5px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
-                        <input class="form-check-input" type="radio" id="formCheck-1"
-                               style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
-                                class="form-check-label" for="formCheck-1" style="color: #6e7191;font-weight: bold;">Женщина</label>
+                            в салоне</label><label class="switch"><input type="checkbox"/><span
+                                    class="slider round"></span></label></div>
+                    <div class="d-flex flex-row" style="margin-top: 5px;">
+                        <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
+                             style="margin-right: 5px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
+                            <input name="gender" value="female" id="formCheck-1" class="form-check-input" type="radio"
+                                   style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"/><label
+                                    class="form-check-label" for="formCheck-1"
+                                    style="color: #6e7191;font-weight: bold;">Женщина</label></div>
+                        <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
+                             style="margin-right: 0px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
+                            <input name="gender" value="male" id="formCheck-2" class="form-check-input" type="radio"
+                                   style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"/><label
+                                    class="form-check-label" for="formCheck-2"
+                                    style="color: #6e7191;font-weight: bold;">Мужчина</label></div>
                     </div>
-                    <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
-                         style="margin-right: 0px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
-                        <input class="form-check-input" type="radio" id="formCheck-2"
-                               style="margin-left: -5px;margin-right: 6px;margin-top: 0px;"><label
-                                class="form-check-label" for="formCheck-2" style="color: #6e7191;font-weight: bold;">Мужчина</label>
-                    </div>
-                </div>
+                    <button class="btn btn-primary" type="submit" name="accept"
+                            style="width: 150px;margin-top: 15px;margin-bottom: 15px;background: #5f2eea;">Применить
+                    </button>
+                </form>
             </div>
         </div>
     </div>
+
+
 </section>
 
 <!--Footer-->

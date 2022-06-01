@@ -19,9 +19,11 @@
                     <div class="dropdown-menu"><a class="dropdown-item" href="#">Москва</a>
                         <a class="dropdown-item" href="#">Санкт-Петербург</a>
                         <a class="dropdown-item" href="#">Новосибирск</a>
-                        <a class="dropdown-item" href="#">Екатеринбург</a>
+                        <a class="dropdown-item" href="#"
+                        >Екатеринбург</a>
                         <a class="dropdown-item" href="#">Казань</a>
-                        <a class="dropdown-item" href="#">Нижний Новгород</a>
+                        <a class="dropdown-item" href="#">Нижний
+                            Новгород</a>
                         <a class="dropdown-item" href="#">Челябинск</a>
                         <a class="dropdown-item" href="#">Омск</a>
                         <a class="dropdown-item" href="#">Ростов-на-Дону</a>
@@ -33,6 +35,7 @@
                         <a class="dropdown-item" href="#">Волгоград</a>
                         <a class="dropdown-item" href="#">Краснодар</a>
                     </div>
+
                 </li>
                 <li class="nav-item"><a class="nav-link fw-bolder" href="index.php"
                                         style="color: rgb(22,1,65);font-weight: bold;--bs-body-font-weight: normal;">Найти</a>
@@ -46,10 +49,12 @@
             </ul>
             <div class="dropdown">
                 <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1"
-                   data-bs-toggle="dropdown" aria-expanded="false"> <?php if(isset($_SESSION['logged_user'])) : ?>
-                        <img src="assets/img/avatars/<?php echo R::findOne('users','id = ?', array($_SESSION['logged_user']->id))->avatar;?>" alt="mdo" width="48" height="48" class="rounded-circle">
+                   data-bs-toggle="dropdown" aria-expanded="false"> <?php if (isset($_SESSION['logged_user'])) : ?>
+                        <img src="assets/img/avatars/<?php echo R::findOne('users', 'id = ?', array($_SESSION['logged_user']->id))->avatar; ?>"
+                             alt="mdo" width="48" height="48" class="rounded-circle">
                     <?php else: ?>
-                        <img src="assets/img/avatars/avatar.jpg" alt="mdo" width="48" height="48" class="rounded-circle">
+                        <img src="assets/img/avatars/avatar.jpg" alt="mdo" width="48" height="48"
+                             class="rounded-circle">
                     <?php endif; ?>
 
                 </a>

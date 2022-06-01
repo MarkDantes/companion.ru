@@ -1,30 +1,46 @@
 <?php
 
-function printPassengers($pass)
+function printPassengers($passengers)
 {
 
 }
 
-function printElement($trip)
+function printElementFind($trip)
 {
     foreach ($trip as $item) {
-
         echo '<div class="d-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
-                     style="box-shadow: 5px 5px 2px rgba(0,0,0,0.25);border-radius: 32px;width: 445px;height: 115px;font-family: Poppins, sans-serif;margin-bottom: 30px;">
-                    <div class="d-flex flex-column"><input class="d-flex d-xxl-flex" type="text" readonly=""
-                                                           style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                           value="'.$item->price.'₽"><input class="d-flex" type="text" readonly=""
-                                                                                style="color: #6e7191;height: 30px;width: 112px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;"
-                                                                                value="'.$item->data.'"></div>
-                    <input class="d-flex d-xxl-flex" type="text" readonly="" value="Cоздано"
-                           style="width: 130px;height: 30px;font-family: Poppins, sans-serif;font-size: 15px;color: #14142b;font-weight: bold;padding: 0px;margin-left: 40px;margin-right: 60px;border-style: none;"><a
-                            class="btn btn-primary d-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center"
-                            role="button"
-                            style="border-width: 3px;border-color: #5f2eea;background: #ffffff;width: 55px;height: 55px;border-radius: 80px;color: #5f2eea;font-size: 25px;padding: 0px;padding-top: 0px;"
-                            href="#modal-'.$item->id.'" data-bs-target="#modal-'.$item->id.'" data-bs-toggle="modal">&gt;</a>
+     style="margin-bottom: 30px;box-shadow: 5px 5px 2px rgba(0,0,0,0.25);border-radius: 32px;font-family: Poppins, sans-serif;height: 115px;background: #ffffff;">
+    <div class="text-center d-flex flex-column flex-wrap align-items-sm-center justify-content-xl-center justify-content-xxl-start"
+         style="margin-bottom: 0px;margin-top: 0px;margin-right: 40px;"><img class="rounded-circle d-flex d-xl-flex"
+                                                                             src="assets/img/avatars/' . $item->avatar . '"
+                                                                             width="60px" height="60px"
+                                                                             style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;margin: 0px;margin-left: 0px;"/>
+        <p style="font-size: 12px;margin: 0px;margin-top: 0px;margin-left: 20px;"></p><input
+                class="d-flex d-xl-flex flex-shrink-1" type="text"
+                style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 110px;height: 30px;"
+                placeholder="Имя Фамилия" value="' . $item->driver . '" autocomplete="on" inputmode="latin-name"
+                readonly/>
+    </div>
+    <div class="d-flex d-xxl-flex flex-row flex-wrap align-items-xxl-center"
+         style="margin: 10px;margin-top: 10px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 40px;">
+        <input type="text" value="' . $item->start . '" autocomplete="on" readonly
+               style="border-style: none;font-weight: bold;width: 123.6px;"/><i class="la la-long-arrow-right"
+                                                                                style="margin-left: 9px;margin-right: 10px;width: 24px;height: 24px;color: #5f2eea;margin-top: 6px;"></i><input
+                class="flex-shrink-1" type="text" value="'.$item->end.'"
+                style="border-style: none;font-weight: bold;width: 128.6px;" readonly/></div>
+    <div class="d-flex flex-column" style="margin-right: 30px;"><input class="d-flex d-xxl-flex" type="text" readonly
+                                                                       style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
+                                                                       value="' . $item->price . '₽"/><input
+                class="d-flex" type="text" readonly
+                style="color: #6e7191;height: 30px;width: 112px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;"
+                value="'.$item->data.'"/></div>
+    <button class="btn btn-primary d-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center"
+            type="button"
+            style="border-width: 3px;border-color: #5f2eea;background: #ffffff;width: 55px;height: 55px;border-radius: 80px;color: #5f2eea;font-size: 25px;padding: 0px;padding-top: 0px;"
+            data-bs-target="#modal-3-'.$item->id.'" data-bs-toggle="modal">&gt;
+    </button>
 
-                    
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-'.$item->id.'">
+     <div class="modal fade" role="dialog" tabindex="-1" id="modal-3-'.$item->id.'">
                         <div class="modal-dialog modal-lg" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -152,8 +168,8 @@ function printElement($trip)
                                     </div>
                                 </div>
                                 <div class="modal-footer d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center align-items-xxl-center">
-                                    <button class="btn btn-primary" type="submit" name="delete"
-                                            style="background: #5f2eea;width: 200px;height: 55px;">Удалить
+                                    <button class="btn btn-primary" type="submit" name="booking" value="'.$item->id.'"
+                                            style="background: #5f2eea;width: 200px;height: 55px;">Забронировать
                                     </button>
                                 </div>
                             </div>
@@ -189,5 +205,8 @@ function printElement($trip)
                     </div>
                 </div>';
     }
-return true;
 }
+
+?>
+
+
