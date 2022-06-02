@@ -15,27 +15,60 @@
                                                  data-bs-toggle="dropdown" href="#"
                                                  style="--bs-body-font-weight: normal;font-family: Poppins, sans-serif;font-weight: bold;color: #160141;"><i
                                 class="la la-location-arrow"
-                                style="margin-bottom: 0px;margin-right: 5px;transform: rotate(45deg);font-weight: bold;"></i>Город&nbsp;</a>
-                    <div class="dropdown-menu"><a class="dropdown-item" href="#">Москва</a>
-                        <a class="dropdown-item" href="#">Санкт-Петербург</a>
-                        <a class="dropdown-item" href="#">Новосибирск</a>
-                        <a class="dropdown-item" href="#"
-                        >Екатеринбург</a>
-                        <a class="dropdown-item" href="#">Казань</a>
-                        <a class="dropdown-item" href="#">Нижний
-                            Новгород</a>
-                        <a class="dropdown-item" href="#">Челябинск</a>
-                        <a class="dropdown-item" href="#">Омск</a>
-                        <a class="dropdown-item" href="#">Ростов-на-Дону</a>
-                        <a class="dropdown-item" href="#">Самара</a>
-                        <a class="dropdown-item" href="#">Уфа</a>
-                        <a class="dropdown-item" href="#">Красноярск</a>
-                        <a class="dropdown-item" href="#">Воронеж</a>
-                        <a class="dropdown-item" href="#">Пермь</a>
-                        <a class="dropdown-item" href="#">Волгоград</a>
-                        <a class="dropdown-item" href="#">Краснодар</a>
+                                style="margin-bottom: 0px;margin-right: 5px;transform: rotate(45deg);font-weight: bold;"></i>Город: <?php echo $_SESSION['city']?></a>
+                    <div class="dropdown-menu">
+                        <form action="index.php" method="post"
+                              class="d-flex d-xxl-flex flex-column justify-content-xxl-center">
+                            <button class="btn btn-primary" type="submit" name="city"value="Москва"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Москва
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Санкт-Петербург"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Санкт-Петербург
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Воронеж"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Воронеж
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Нижний Новгород"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Нижний Новгород
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Ростов-на-Дону"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Ростов-на-Дону
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Омск"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Омск
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Новосибирск"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Новосибирск
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Екатеринбург"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Екатеринбург
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Красноярск"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Красноярск
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Казань"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Казань
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Пермь"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Пермь
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Челябинск"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Челябинск
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Самара"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Самара
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city"value="Уфа"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Уфа
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city" value="Новосибирск"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Новосибирск
+                            </button>
+                            <button class="btn btn-primary" type="submit" name="city" value="Краснодар"
+                                    style="background: #ffffff;color: #14142b;border-style: none;">Краснодар
+                            </button>
+                        </form>
                     </div>
-
                 </li>
                 <li class="nav-item"><a class="nav-link fw-bolder" href="index.php"
                                         style="color: rgb(22,1,65);font-weight: bold;--bs-body-font-weight: normal;">Найти</a>

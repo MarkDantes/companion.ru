@@ -12,7 +12,13 @@ $data = $_POST;
 $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
 $secret = "2db57c4bf885349d4f342858fb8e1de2faf7d81f";
 
+$city = "Ростов-на-Дону";
 
+if(isset($data['city']))
+{
+$city = $data['city'];
+$_SESSION['city']= $data['city'];
+}
 
 if (isset($data['find'])) {
 //Ищем поездку
@@ -21,9 +27,9 @@ if (isset($data['find'])) {
 
     $dadata = new Dadata($token, null);
     $dadata->init();
-    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city"=>"Ростов-на-Дону"));
+    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city"=>$city));
     $resultOne=$dadata->suggest("address", $fieldsOne);
-    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city"=>"Ростов-на-Дону"));
+    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city"=>$city));
     $resultTwo=$dadata->suggest("address", $fieldsTwo);
 
     $find = R::dispense('finds');

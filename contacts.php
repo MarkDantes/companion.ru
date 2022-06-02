@@ -64,6 +64,7 @@ require "db.php";
     </div>
 </section>
 
+
 <!--Footer-->
 <?php include("includes/footer.php"); ?>
 

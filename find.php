@@ -4,14 +4,24 @@ require "libs/dadata.php";
 include "findelement.php";
 include "distance.php";
 
+
+
+
+
 $data = $_POST;
 $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
 $secret = "2db57c4bf885349d4f342858fb8e1de2faf7d81f";
 
+$city = "Ростов-на-Дону";
+
+if(isset($data['city']))
+{
+    $city = $data['city'];
+}
 $trips = R::find("trips");
 
 //Проверяем параметры отображения
-function trip($trips)
+function trip($trips,$city)
 {
     $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
     $dadata = new Dadata($token, null);
@@ -20,9 +30,9 @@ function trip($trips)
     // Проверяем расстояние, чтоб оно было меньше 1.5км от точек поиска до точек маршрута
     foreach ($trips as $item) {
 
-        $fieldsOne = array("query" => $item->start, "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+        $fieldsOne = array("query" => $item->start, "count" => 1, "locations" => array("city" =>$city));
         $resultOne = $dadata->suggest("address", $fieldsOne);
-        $fieldsTwo = array("query" => $item->end, "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+        $fieldsTwo = array("query" => $item->end, "count" => 1, "locations" => array("city" =>$city));
         $resultTwo = $dadata->suggest("address", $fieldsTwo);
 
 
@@ -59,9 +69,9 @@ if (isset($data['find'])) {
     $dadata->init();
 
     //находим адреса и всю информацию по ним
-    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city" => $_SESSION["city"]));
     $resultOne = $dadata->suggest("address", $fieldsOne);
-    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
+    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city" => $_SESSION["city"]));
     $resultTwo = $dadata->suggest("address", $fieldsTwo);
 
     $find = R::findOne('finds', 'id = ?', array($_SESSION['last_search']->id));
@@ -81,7 +91,7 @@ if (isset($data['find'])) {
 }
 $result = array();
 if(isset($data['filter'])){
-    $el = trip($trips);
+    $el = trip($trips,$city);
     foreach ($el as $item){
         if(($data['animal'] == null && $item->animal == "0" || $data['animal'] == "on" && $item->animal == "1")
             && ($data['seats'] == null && $item->seats == "0" || $data['seats'] == "on" && $item->seats == "1")
@@ -95,7 +105,7 @@ if(isset($data['filter'])){
 }
 else
 {
-    $result=trip($trips);
+    $result=trip($trips,$city);
 }
 
 if (isset($data['booking'])) {
