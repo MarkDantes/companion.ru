@@ -5,6 +5,11 @@ if (!isset($_SESSION['logged_user'])) {
     header("Location: /login.php");
 }
 
+if($_SESSION['logged_user']->car == null)
+{
+    header("Location: /profile.php");
+}
+
 $data = $_POST;
 $user = R::findOne('users', 'id = ?', array($_SESSION['logged_user']->id));
 
@@ -147,31 +152,6 @@ if (isset($data['create'])) {
                                 </button>
                             </div>
 
-                            <!--Stops-->
-                            <div class="input-group justify-content-center align-items-center align-content-center"
-                                 style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 325px;height: 57px;margin-top: 30px;margin-bottom: 0px;"><span
-                                        class="d-xxl-flex input-group-text"
-                                        style="background: #ffffff;border-top-color: #14142b;border-bottom-color: #14142b;border-left-color: #14142b;padding-top: 11.6px;height: 46.8px;width: 83px;"><svg
-                                            class="bi bi-plus-circle d-xxl-flex" xmlns="http://www.w3.org/2000/svg"
-                                            width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"
-                                            style="width: 13px;height: 13px;">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
-                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"></path>
-                                    </svg><i class="material-icons d-xxl-flex"
-                                             style="color: #6f6c90;--bs-light: #f5f6f8;--bs-light-rgb: 245,246,248;">location_on</i></span><input
-                                        class="form-control" type="text"
-                                        style="border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;height: 46.8px;font-family: Poppins, sans-serif;"
-                                        placeholder="Остановки" name="stops"/>
-                                <button class="btn btn-primary" type="button"
-                                        style="background: #ffffff;border-top-right-radius: 16px;border-bottom-right-radius: 16px;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;height: 46.8px;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
-                                         fill="none"
-                                         style="width: 24px;height: 24px;color: #A0A3BD;margin-right: -6px;">
-                                        <path d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
-                                              fill="currentColor"></path>
-                                    </svg>
-                                </button>
-                            </div>
 
                             <!--Data time-->
                             <input class="form-control" type="datetime-local" name="data" required

@@ -10,13 +10,14 @@ $secret = "2db57c4bf885349d4f342858fb8e1de2faf7d81f";
 
 $trips = R::find("trips");
 
-//Проверяем, чтоб расстояние было меньше 1.5км от точек поиска до точек маршрута
+//Проверяем параметры отображения
 function trip($trips)
 {
     $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
     $dadata = new Dadata($token, null);
     $dadata->init();
     $filter = array();
+    // Проверяем расстояние, чтоб оно было меньше 1.5км от точек поиска до точек маршрута
     foreach ($trips as $item) {
 
         $fieldsOne = array("query" => $item->start, "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
@@ -34,14 +35,27 @@ function trip($trips)
 
     }
     $dadata->close();
-    return $filter;
+
+    $result = array();
+    //Проверяем дату
+    foreach ($filter as $item)
+    {
+        $date1 =new DateTime($item->data);
+
+        $date2 = $_SESSION['last_search']->date;
+        if ($date1->format('Y-m-d')==$date2){
+            array_push($result,$item);
+        }
+    }
+
+    return $result;
 
 }
 
 if (isset($data['find'])) {
 //Ищем поездку
 
-    unset($_SESSION['last_search']);
+
 
     $dadata = new Dadata($token, null);
     $dadata->init();
@@ -58,7 +72,7 @@ if (isset($data['find'])) {
     $find->date = $data['date'];
     $dadata->close();
     R::store($find);
-
+    unset($_SESSION['last_search']);
     $_SESSION['last_search'] = $find;
 
 
@@ -108,7 +122,8 @@ if (isset($data['booking'])) {
     <div class="container position-relative">
         <div class="row">
             <div class="col">
-                <form class="d-flex flex-row align-content-center flex-wrap align-items-sm-center align-items-md-center align-items-lg-center justify-content-xxl-center p-3 p-xl-4"
+                <form action="find.php" method="post"
+                      class="d-flex flex-row align-content-center flex-wrap align-items-sm-center align-items-md-center align-items-lg-center justify-content-xxl-center p-3 p-xl-4"
                       style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;margin: 0px;margin-top: 0px;margin-bottom: 0px;">
                     <div class="input-group justify-content-center align-items-center align-content-center flex-wrap m-auto"
                          style="--bs-primary: #ffffff;--bs-primary-rgb: 255,255,255;width: 300px;height: 55px;border-top-right-radius: 16px;border-bottom-right-radius: 16px;margin: 0px;margin-top: 30px;margin-bottom: 0px;font-family: Poppins, sans-serif;margin-left: 0px;"><span
@@ -125,7 +140,7 @@ if (isset($data['booking'])) {
                                 </svg></span><input class="form-control" type="text"
                                                     style="border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
                                                     placeholder="Откуда" name="start" required="">
-                        <button class="btn btn-primary" type="button"
+                        <button class="btn btn-primary"
                                 style="background: #ffffff;border-top-right-radius: 16px;border-bottom-right-radius: 16px;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;padding-left: 30px;height: 46.8px;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"
                                  fill="none" style="width: 24px;height: 24px;color: #A0A3BD;">
@@ -159,7 +174,7 @@ if (isset($data['booking'])) {
                     <input class="form-control d-xxl-flex flex-wrap m-auto" type="date" name="date" required=""
                            style="width: 300px;height: 55px;margin-top: 0px;border-color: #14142b;border-bottom-color: #14142b;padding-right: 30px;padding-left: 31px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 10px;margin-left: 0px;">
                     <button class="btn btn-primary d-flex d-xxl-flex justify-content-center align-items-center m-auto justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-xxl-center align-items-xxl-center"
-                            type="submit"
+                            type="submit" name="find"
                             style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;width: 200px;height: 50px;background: #5f2eea;border-radius: 16px;margin: -33px;">
                         Найти
                     </button>
@@ -171,7 +186,11 @@ if (isset($data['booking'])) {
     <div class="container">
         <div class="row d-md-flex justify-content-md-center">
             <div class="col-lg-8 col-xl-9 col-xxl-9 d-flex flex-column">
+
+                <!--Print all satisfying us ellements-->
                 <?php printElementFind(trip($trips)); ?>
+
+
             </div>
             <div class="col-md-5 col-lg-4 col-xl-3 col-xxl-3 d-flex justify-content-center flex-wrap justify-content-sm-center">
                 <form class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
