@@ -81,9 +81,15 @@ if (isset($data['find'])) {
         <div class="row">
             <div class="col d-flex d-xl-flex justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center"
                  style="border-radius: 32px;box-shadow: 0px 8px 16px rgba(17,17,17,0.04);--bs-body-bg: var(--bs-white);--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;background: var(--bs-white);height: 630.4px;">
+
+                <?php if (!isset($data['find'])) : ?>
+                    <iframe allowfullscreen frameborder="0" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&q=<?php echo $_SESSION['city']?>&zoom=12" width="100%" height="100%"
+                            style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;border-radius: 32px;margin-top: 0;margin-bottom: 0px;height: 600px;"></iframe>
+                <?php else: ?>
+                <!--Map-->
                 <iframe allowfullscreen frameborder="0" src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&origin=<?php echo $_SESSION['last_search']->start_lat?>,<?php echo $_SESSION['last_search']->start_lon ?>&destination=<?php echo $_SESSION['last_search']->end_lat?>,<?php echo $_SESSION['last_search']->end_lon ?>&zoom=12&mode=driving" width="100%" height="100%"
                         style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;border-radius: 32px;margin-top: 0;margin-bottom: 0px;height: 600px;"></iframe>
-
+                <?php endif; ?>
             </div>
             <div class="col-md-6 col-xl-4 col-xxl-4 d-flex justify-content-center align-items-center m-auto justify-content-sm-center align-items-xl-center justify-content-xxl-center align-items-xxl-center">
 
