@@ -12,7 +12,11 @@ $user = R::findOne('users', 'id = ?', array($_SESSION['logged_user']->id));
 $tripsDriver = R::find("trips", "driver = ?", array($user->person));
 $tripsPassenger = R::find("trips", "passenger = ?", array($user->person));
 
+if (isset($data['delete'])) {
+    $trip = R::load('trips', $data['delete']);
+    R::trash($trip);
 
+}
 ?>
 
 <!DOCTYPE html>

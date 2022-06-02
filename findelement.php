@@ -168,9 +168,11 @@ function printElementFind($trip)
                                     </div>
                                 </div>
                                 <div class="modal-footer d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center align-items-xxl-center">
+                                    <form action="find.php" method="post">
                                     <button class="btn btn-primary" type="submit" name="booking" value="'.$item->id.'"
                                             style="background: #5f2eea;width: 200px;height: 55px;">Забронировать
                                     </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
