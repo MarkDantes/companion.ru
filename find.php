@@ -55,16 +55,18 @@ function trip($trips)
 if (isset($data['find'])) {
 //Ищем поездку
 
-
-
     $dadata = new Dadata($token, null);
     $dadata->init();
+
+    //находим адреса и всю информацию по ним
     $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
     $resultOne = $dadata->suggest("address", $fieldsOne);
     $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city" => "Ростов-на-Дону"));
     $resultTwo = $dadata->suggest("address", $fieldsTwo);
 
     $find = R::findOne('finds', 'id = ?', array($_SESSION['last_search']->id));
+
+    //Извлекаем широту и долготу
     $find->startLat = $resultOne["suggestions"][0]["data"]["geo_lat"];
     $find->startLon = $resultOne["suggestions"][0]["data"]["geo_lon"];
     $find->endLat = $resultTwo["suggestions"][0]["data"]["geo_lat"];
@@ -76,6 +78,24 @@ if (isset($data['find'])) {
     $_SESSION['last_search'] = $find;
 
 
+}
+$result = array();
+if(isset($data['filter'])){
+    $el = trip($trips);
+    foreach ($el as $item){
+        if(($data['animal'] == null && $item->animal == "0" || $data['animal'] == "on" && $item->animal == "1")
+            && ($data['seats'] == null && $item->seats == "0" || $data['seats'] == "on" && $item->seats == "1")
+            && ($data['baby'] == null && $item->baby == "0" || $data['baby'] == "on" && $item->baby == "1")
+            && ($data['smoke'] == null && $item->smoke == "0" || $data['smoke'] == "on" && $item->smoke == "1")
+            && ($data['gender'] == $item->gender )
+        ){
+        array_push($result,$item);
+        }
+    }
+}
+else
+{
+    $result=trip($trips);
 }
 
 if (isset($data['booking'])) {
@@ -108,7 +128,6 @@ if (isset($data['booking'])) {
     <link rel="stylesheet" href="assets/fonts/material-icons.min.css">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand.css">
     <link rel="stylesheet" href="assets/css/Toggle-Switch-2.css">
-
 
 </head>
 
@@ -187,38 +206,48 @@ if (isset($data['booking'])) {
         <div class="row d-md-flex justify-content-md-center">
             <div class="col-lg-8 col-xl-9 col-xxl-9 d-flex flex-column">
 
-                <!--Print all satisfying us ellements-->
-                <?php printElementFind(trip($trips)); ?>
+                <!--Print all satisfying us elements-->
+                <?php printElementFind($result); ?>
 
 
             </div>
+
+            <!--Filter-->
             <div class="col-md-5 col-lg-4 col-xl-3 col-xxl-3 d-flex justify-content-center flex-wrap justify-content-sm-center">
                 <form class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
-                      method="post">
+                     action="find.php" method="post">
+
+                    <!--animal-->
                     <div class="d-flex d-xxl-flex flex-row flex-grow-0 align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-flex d-xxl-flex"
                                style="margin-right: 15px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Можно
-                            с животными</label><label class="switch"><input type="checkbox"/><span
+                            с животными</label><label class="switch"><input name="animal" type="checkbox"/><span
                                     class="slider round"></span></label></div>
+
+                    <!--seats-->
                     <div class="d-flex d-xxl-flex align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-xxl-flex"
                                style="margin-right: 73px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Сзади
-                            2 места</label><label class="switch"><input type="checkbox"/><span
+                            2 места</label><label class="switch"><input name="seats" type="checkbox"/><span
                                     class="slider round"></span></label></div>
+                    <!--baby-->
                     <div class="d-flex d-xxl-flex align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-xxl-flex"
                                style="margin-right: 61px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Детское
-                            кресло</label><label class="switch"><input type="checkbox"/><span
+                            кресло</label><label class="switch"><input name="baby" type="checkbox"/><span
                                     class="slider round"></span></label></div>
+                    <!--smoke-->
                     <div class="d-flex d-xxl-flex align-items-center justify-content-xxl-center align-items-xxl-center"
                          style="width: 285px;height: 65px;margin-top: 30px;margin-left: 0px;background: #eff0f6;border-radius: 16px;--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;">
                         <label class="form-label d-xxl-flex"
                                style="margin-right: 39px;font-family: Poppins, sans-serif;font-size: 18px;color: #6e7191;font-weight: bold;margin-left: 10px;margin-top: 5px;">Курение
-                            в салоне</label><label class="switch"><input type="checkbox"/><span
+                            в салоне</label><label class="switch"><input name="smoke" type="checkbox"/><span
                                     class="slider round"></span></label></div>
+
+                    <!--gender-->
                     <div class="d-flex flex-row" style="margin-top: 5px;">
                         <div class="form-check d-flex align-items-center justify-content-xl-start align-items-xl-center"
                              style="margin-right: 5px;background: #eff0f6;width: 152px;height: 60px;font-family: Poppins, sans-serif;border-radius: 16px;margin-bottom: 0px;">
@@ -233,7 +262,7 @@ if (isset($data['booking'])) {
                                     class="form-check-label" for="formCheck-2"
                                     style="color: #6e7191;font-weight: bold;">Мужчина</label></div>
                     </div>
-                    <button class="btn btn-primary" type="submit" name="accept"
+                    <button class="btn btn-primary" type="submit" name="filter"
                             style="width: 150px;margin-top: 15px;margin-bottom: 15px;background: #5f2eea;">Применить
                     </button>
                 </form>

@@ -20,6 +20,7 @@ if (isset($data['create'])) {
     $trip = R::dispense('trips');
     $trip->driver = $user->person;
     $trip->avatar = $user->avatar;
+    $trip->gender=$user->gender;
     $trip->phone = $user->phone;
     $trip->car = $user->car;
     $trip->start = $data['start'];
