@@ -26,6 +26,7 @@ if (!isset($_SESSION['logged_user'])) {
 }
 
 if (isset($data['profile'])) {
+    unset($_SESSION['logged_user']);
     $avatar = $_FILES['avatar'];
     if (avatarSecurity($avatar)) {
         loadAvatar($avatar, $user);
@@ -50,7 +51,7 @@ if (isset($data['profile'])) {
     $user->car = $data['car'];
     $user->gender= $data['gender'];
     R::store($user);
-
+    $_SESSION['logged_user'] = $user;
     header("Location: /profile.php");
 }
 

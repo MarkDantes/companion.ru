@@ -1,7 +1,33 @@
 <?php
 
-function printPassengers($pass)
+function countPassenger($item){
+    $passengers = array();
+    $count =0;
+    $passengers = R::findAll('passengers', 'tripid = ?', array($item->id));
+    foreach ($passengers as $it)
+    {
+        $count++;
+    }
+
+
+return $count;
+}
+
+function printPassengers($elem)
 {
+    $passengers = array();
+    $passengers = R::findAll('passengers', 'tripid = ?', array($elem->id));
+
+
+    foreach ($passengers as $item) {
+        $users = R::findOne("users","id = ?", array($item->passid) );
+       echo '
+                                        <input class="d-flex d-xl-flex flex-shrink-1" type="text"
+                                               style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
+                                               placeholder="Имя Фамилия" value="'.$users->person.'" autocomplete="on" inputmode="latin-name"
+                                               readonly="">
+                                    ';
+    }
 
 }
 
@@ -9,22 +35,37 @@ function printElement($trip)
 {
     foreach ($trip as $item) {
 
+        $status =null;
+        if ($item->driver==$_SESSION['logged_user']->person)
+        {
+            $status = "Cоздано";
+        }
+        else
+        {
+           $passenger = R::find("passengers", "passid = ?", array($_SESSION['logged_user']->id) );
+           foreach ($passenger as $it)
+           if ($item->id == $it->tripid)
+            {
+                $status = "Забронировано";
+            }
+        }
+
         echo '<div class="d-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
                      style="box-shadow: 5px 5px 2px rgba(0,0,0,0.25);border-radius: 32px;width: 445px;height: 115px;font-family: Poppins, sans-serif;margin-bottom: 30px;">
                     <div class="d-flex flex-column"><input class="d-flex d-xxl-flex" type="text" readonly=""
                                                            style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                           value="'.$item->price.'₽"><input class="d-flex" type="text" readonly=""
+                                                           value="' . $item->price . '₽"><input class="d-flex" type="text" readonly=""
                                                                                 style="color: #6e7191;height: 30px;width: 112px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;"
-                                                                                value="'.(new DateTime($item->data))->format('Y-m-d').'"></div>
-                    <input class="d-flex d-xxl-flex" type="text" readonly="" value="Cоздано"
+                                                                                value="' .(new DateTime($item->data))->format('Y-m-d') . '"></div>
+                    <input class="d-flex d-xxl-flex" type="text" readonly="" value="'.$status.'"
                            style="width: 130px;height: 30px;font-family: Poppins, sans-serif;font-size: 15px;color: #14142b;font-weight: bold;padding: 0px;margin-left: 40px;margin-right: 60px;border-style: none;"><a
                             class="btn btn-primary d-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center"
                             role="button"
                             style="border-width: 3px;border-color: #5f2eea;background: #ffffff;width: 55px;height: 55px;border-radius: 80px;color: #5f2eea;font-size: 25px;padding: 0px;padding-top: 0px;"
-                            href="#modal-'.$item->id.'" data-bs-target="#modal-'.$item->id.'" data-bs-toggle="modal">&gt;</a>
+                            href="#modal-' . $item->id . '" data-bs-target="#modal-' . $item->id . '" data-bs-toggle="modal">&gt;</a>
 
                     
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-'.$item->id.'">
+                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-' . $item->id . '">
                         <div class="modal-dialog modal-lg" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -43,11 +84,11 @@ function printElement($trip)
                                              style="margin-bottom: 10px;">
                                             <div class="d-flex d-xxl-flex flex-row align-items-xxl-center"
                                                  style="margin: 10px;margin-top: 10px;font-family: Poppins, sans-serif;margin-bottom: 0px;margin-right: 0px;">
-                                                <input type="text" value="'.$item->start.'" autocomplete="on" readonly=""
+                                                <input type="text" value="' . $item->start . '" autocomplete="on" readonly=""
                                                        style="border-style: none;font-weight: bold;width: 123.6px;"><i
                                                         class="la la-long-arrow-right"
                                                         style="margin-left: 9px;margin-right: 10px;width: 24px;height: 24px;color: #5f2eea;margin-top: 6px;"></i><input
-                                                        class="flex-shrink-1" type="text" value="'.$item->end.'"
+                                                        class="flex-shrink-1" type="text" value="' . $item->end . '"
                                                         style="border-style: none;font-weight: bold;width: 128.6px;"
                                                         readonly=""></div>
                                             <div class="d-flex flex-column align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
@@ -55,13 +96,13 @@ function printElement($trip)
                                                 <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
                                                      style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
                                                             class="rounded-circle d-flex d-xl-flex"
-                                                            src="assets/img/avatars/'.$item->avatar.'" width="60px"
+                                                            src="assets/img/avatars/' . $item->avatar . '" width="60px"
                                                             height="60px"
                                                             style="background-color: rgb(255,255,255);padding: 2px;width: 48px;height: 48px;margin: 0px;margin-left: 0px;">
                                                     <p style="font-size: 12px;margin: 0px;margin-top: 0px;margin-left: 20px;"></p>
                                                     <input class="d-flex d-xl-flex flex-shrink-1" type="text"
                                                            style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
-                                                           placeholder="Имя Фамилия" value="'.$item->driver.'" autocomplete="on"
+                                                           placeholder="Имя Фамилия" value="' . $item->driver . '" autocomplete="on"
                                                             readonly="">
                                                 </div>
                                                 <div class="input-group d-flex d-xl-flex align-content-center"
@@ -82,7 +123,7 @@ function printElement($trip)
                                                             </svg></span><input class="form-control d-lg-flex"
                                                                                 type="text"
                                                                                 style="height: 70px;background: #ffffff;border-width: 2px;border-color: #5f2eea;border-top-color: #5F2EEA;border-right-style: none;border-right-color: rgb(255,255,255);border-bottom-color: #5F2EEA;border-left-style: none;border-left-color: rgba(255,255,255,0);"
-                                                                                placeholder="Машина" value="'.$item->car.'" readonly=""
+                                                                                placeholder="Машина" value="' . $item->car . '" readonly=""
                                                                                 autocomplete="on">
                                                     <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
                                                             type="button"
@@ -97,7 +138,7 @@ function printElement($trip)
                                                                 style="width: 24px;height: 24px;"></i></span><input
                                                             class="form-control" type="number"
                                                             style="height: 70px;background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
-                                                            placeholder="Телефон" value ="'.$item->phone.'" readonly="">
+                                                            placeholder="Телефон" value ="' . $item->phone . '" readonly="">
                                                     <button class="btn btn-primary disabled d-xl-flex align-items-xl-center"
                                                             type="button"
                                                             style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 70px;padding: 0px;margin-left: 0px;width: 47px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;"
@@ -110,23 +151,23 @@ function printElement($trip)
                                                  style="margin-top: 10px;"><input class="d-flex d-xxl-flex" type="text"
                                                                                   readonly=""
                                                                                   style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
-                                                                                  value="'.$item->price.'₽"><input class="d-flex"
+                                                                                  value="' . $item->price . '₽"><input class="d-flex"
                                                                                                        type="text"
                                                                                                        readonly=""
                                                                                                        style="color: #6e7191;height: 30px;width: 191px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;margin-left: 20px;"
-                                                                                                       value="'.$item->data.'">
+                                                                                                       value="' . $item->data . '">
                                             </div>
                                             <div class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
                                                  style="background: #eff0f6;padding: 15px;padding-bottom: 15px;padding-left: 20px;border-radius: 32px;">
                                                 <input type="text" readonly="" autocomplete="on"
                                                        style="border-style: none;background: rgba(255,255,255,0);margin-top: 0px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                       '.(($item->animal >0)? 'value="Можно с животными"' : 'value="Нельзя с животными"').'><input type="text"
-                                                                                        '.(($item->seats >0)? 'value="Сзади 2 места"' : 'value="Сзади 3 места"').'
+                                                       ' . (($item->animal > 0) ? 'value="Можно с животными"' : 'value="Нельзя с животными"') . '><input type="text"
+                                                                                        ' . (($item->seats > 0) ? 'value="Сзади 2 места"' : 'value="Сзади 3 места"') . '
                                                                                         readonly="" autocomplete="on"
                                                                                         style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"><input
-                                                        type="text" '.(($item->baby >0)? 'value="Есть детское кресло"' : 'value="Нет детского кресла"').' readonly=""
+                                                        type="text" ' . (($item->baby > 0) ? 'value="Есть детское кресло"' : 'value="Нет детского кресла"') . ' readonly=""
                                                         style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;"
-                                                        autocomplete="on"><input type="text" '.(($item->smoke >0)? 'value="Можно курить"' : 'value="Курить нельзя"').'
+                                                        autocomplete="on"><input type="text" ' . (($item->smoke > 0) ? 'value="Можно курить"' : 'value="Курить нельзя"') . '
                                                                                  readonly="" autocomplete="on"
                                                                                  style="border-style: none;background: rgba(255,255,255,0);margin-top: 5px;width: 170.6px;color: #6f6c90;font-weight: bold;">
                                                 <p style="margin-bottom: 0px;margin-top: 12px;margin-right: 124px;font-weight: bold;font-family: Poppins, sans-serif;"></p>
@@ -139,21 +180,22 @@ function printElement($trip)
                                                             class="form-control d-flex d-xxl-flex flex-wrap justify-content-xxl-start align-items-xxl-center"
                                                             type="text"
                                                             style="background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;padding-right: 0px;padding-bottom: 7.6px;padding-top: 8.6px;color: #6f6c90;font-weight: bold;width: 107px;"
-                                                            readonly="" value="Занято: 2/3 "><a
+                                                            readonly="" '.(($item->seats >0)? 'value="Занято: '.countPassenger($item).'/2 ' : 'value="Занято: '.countPassenger($item).'/3 "').' 
                                                             class="btn btn-primary d-xl-flex align-items-xl-center justify-content-xxl-center"
                                                             role="button"
                                                             style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 24px;padding: 0px;margin-left: 0px;width: 24px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;font-weight: bold;"
                                                             data-bs-target="#modal-2-'.$item->id.'" data-bs-toggle="modal"
                                                             href="#modal-2-'.$item->id.'"><i class="la la-info-circle"
                                                                                style="color: #14142b;font-weight: bold;"></i>
-                                                    </a></div>
+                                                                            
+                                                    </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center align-items-xxl-center">
                                     <form action="history.php" method="post">
-                                    <button class="btn btn-primary" type="submit" name="delete" value="'.$item->id.'"
+                                    <button class="btn btn-primary" type="submit" name="delete" value="' . $item->id . '"
                                             style="background: #5f2eea;width: 200px;height: 55px;">Удалить
                                     </button>
                                     </form>
@@ -163,7 +205,7 @@ function printElement($trip)
                     </div>
 
                     
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-2-'.$item->id.'">
+                   <!-- <div class="modal fade" role="dialog" tabindex="-1" id="modal-2-'.$item->id .'">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -172,8 +214,8 @@ function printElement($trip)
                                             aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                <!--Passenger-->
-                                    <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
+                                Passenger
+                               <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
                                          style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
                                                 class="rounded-circle d-flex d-xl-flex"
                                                 src="assets/img/avatars/avatar.jpg" width="60px" height="60px"
@@ -188,8 +230,8 @@ function printElement($trip)
                                 <div class="modal-footer"></div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>';
     }
-return true;
+    return true;
 }

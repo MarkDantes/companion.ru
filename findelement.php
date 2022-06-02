@@ -1,5 +1,17 @@
 <?php
 
+function countPassenger($item){
+    $passengers = array();
+    $count =0;
+    $passengers = R::findAll('passengers', 'tripid = ?', array($item->id));
+    foreach ($passengers as $it)
+    {
+        $count++;
+    }
+
+    return $count;
+}
+
 function printPassengers($passengers)
 {
 
@@ -155,21 +167,21 @@ function printElementFind($trip)
                                                             class="form-control d-flex d-xxl-flex flex-wrap justify-content-xxl-start align-items-xxl-center"
                                                             type="text"
                                                             style="background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;padding-right: 0px;padding-bottom: 7.6px;padding-top: 8.6px;color: #6f6c90;font-weight: bold;width: 107px;"
-                                                            readonly="" value="Занято: 2/3 "><a
+                                                            readonly="" '.(($item->seats >0)? 'value="Занято: '.countPassenger($item).'/2 ' : 'value="Занято: '.countPassenger($item).'/3 "').'
                                                             class="btn btn-primary d-xl-flex align-items-xl-center justify-content-xxl-center"
                                                             role="button"
                                                             style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 24px;padding: 0px;margin-left: 0px;width: 24px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;font-weight: bold;"
                                                             data-bs-target="#modal-2-'.$item->id.'" data-bs-toggle="modal"
                                                             href="#modal-2-'.$item->id.'"><i class="la la-info-circle"
                                                                                style="color: #14142b;font-weight: bold;"></i>
-                                                    </a></div>
+                                                    </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center align-items-xxl-center">
                                     <form action="find.php" method="post">
-                                    <button class="btn btn-primary" type="submit" name="booking" value="'.$item->id.'"
+                                    <button class="btn btn-primary" type="submit" name="booking" '.(((countPassenger($item) == 2 && $item->seats==1 ||countPassenger($item) == 3 && $item->seats==0) || !isset($_SESSION['logged_user']) || $_SESSION['logged_user']->person == $item->driver ) ? 'disabled' : '' ).' value="'.$item->id.'"
                                             style="background: #5f2eea;width: 200px;height: 55px;">Забронировать
                                     </button>
                                     </form>
@@ -179,7 +191,7 @@ function printElementFind($trip)
                     </div>
 
                     
-                    <div class="modal fade" role="dialog" tabindex="-1" id="modal-2-'.$item->id.'">
+                    <!--<div class="modal fade" role="dialog" tabindex="-1" id="modal-2-'.$item->id.'">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -188,7 +200,7 @@ function printElementFind($trip)
                                             aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                <!--Passenger-->
+                                Passenger
                                     <div class="text-center d-flex flex-row align-items-sm-center align-items-md-center justify-content-xl-start justify-content-xxl-start"
                                          style="margin-bottom: 0px;margin-top: 0px;margin-right: 0px;"><img
                                                 class="rounded-circle d-flex d-xl-flex"
@@ -204,7 +216,7 @@ function printElementFind($trip)
                                 <div class="modal-footer"></div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>';
     }
 }
