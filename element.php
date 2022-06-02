@@ -15,7 +15,7 @@ function printElement($trip)
                                                            style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
                                                            value="'.$item->price.'₽"><input class="d-flex" type="text" readonly=""
                                                                                 style="color: #6e7191;height: 30px;width: 112px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;"
-                                                                                value="'.$item->data.'"></div>
+                                                                                value="'.(new DateTime($item->data))->format('Y-m-d').'"></div>
                     <input class="d-flex d-xxl-flex" type="text" readonly="" value="Cоздано"
                            style="width: 130px;height: 30px;font-family: Poppins, sans-serif;font-size: 15px;color: #14142b;font-weight: bold;padding: 0px;margin-left: 40px;margin-right: 60px;border-style: none;"><a
                             class="btn btn-primary d-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center"
