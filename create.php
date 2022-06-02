@@ -1,5 +1,9 @@
 <?php
 require "db.php";
+require "libs/dadata.php";
+
+$token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
+$secret = "2db57c4bf885349d4f342858fb8e1de2faf7d81f";
 
 if (!isset($_SESSION['logged_user'])) {
     header("Location: /login.php");
@@ -17,19 +21,34 @@ $user = R::findOne('users', 'id = ?', array($_SESSION['logged_user']->id));
 if (isset($data['create'])) {
 //Cоздаём поездку
 
+    $dadata = new Dadata($token, null);
+    $dadata->init();
+    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
+    $resultOne=$dadata->suggest("address", $fieldsOne);
+    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
+    $resultTwo=$dadata->suggest("address", $fieldsTwo);
+
     $trip = R::dispense('trips');
     $trip->driver = $user->person;
     $trip->avatar = $user->avatar;
     $trip->gender=$user->gender;
+
+    //добавляем координаты точек широта и долгота
+    $trip->startLat = $resultOne["suggestions"][0]["data"]["geo_lat"];
+    $trip->startLon = $resultOne["suggestions"][0]["data"]["geo_lon"];
+    $trip->endLat = $resultTwo["suggestions"][0]["data"]["geo_lat"];
+    $trip->endLon = $resultTwo["suggestions"][0]["data"]["geo_lon"];
+
+    $trip->city=$_SESSION['city'];
     $trip->phone = $user->phone;
     $trip->car = $user->car;
     $trip->start = $data['start'];
     $trip->end = $data['end'];
-    $trip->stops = $data['stops'];
+
     $trip->data = $data['data'];
     $trip->price = $data['price'];
-    $trip->passenger=null;
 
+    $dadata->close();
 
     //filter
     if (isset($_POST['animal']) == true) {

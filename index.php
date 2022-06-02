@@ -27,11 +27,13 @@ if (isset($data['find'])) {
 
     $dadata = new Dadata($token, null);
     $dadata->init();
-    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city"=>$city));
+    //Запрос к API для нахождения адреса в городе, выбранным пользователем
+    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
     $resultOne=$dadata->suggest("address", $fieldsOne);
-    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city"=>$city));
+    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
     $resultTwo=$dadata->suggest("address", $fieldsTwo);
 
+    //Сохраняем в базу запросов поиска
     $find = R::dispense('finds');
     $find->startLat = $resultOne["suggestions"][0]["data"]["geo_lat"];
     $find->startLon = $resultOne["suggestions"][0]["data"]["geo_lon"];

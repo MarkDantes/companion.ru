@@ -17,6 +17,7 @@ $city = "Ростов-на-Дону";
 if(isset($data['city']))
 {
     $city = $data['city'];
+    $_SESSION['city']= $data['city'];
 }
 $trips = R::find("trips");
 
@@ -27,18 +28,16 @@ function trip($trips,$city)
     $dadata = new Dadata($token, null);
     $dadata->init();
     $filter = array();
-    // Проверяем расстояние, чтоб оно было меньше 1.5км от точек поиска до точек маршрута
+
     foreach ($trips as $item) {
 
-        $fieldsOne = array("query" => $item->start, "count" => 1, "locations" => array("city" =>$city));
-        $resultOne = $dadata->suggest("address", $fieldsOne);
-        $fieldsTwo = array("query" => $item->end, "count" => 1, "locations" => array("city" =>$city));
-        $resultTwo = $dadata->suggest("address", $fieldsTwo);
+        //расстояние от 1 обозначенного адреса пассажиром до 1 адреса водителя
+        $d1 = distance($item->start_lat,$item->start_lon, $_SESSION['last_search']->start_lat, $_SESSION['last_search']->start_lon);
 
+        //расстояние от 2 обозначенного адреса пассажиром до 2 адреса водителя
+        $d2 = distance($item->start_lat,$item->start_lon, $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
 
-        $d1 = distance($resultOne["suggestions"][0]["data"]["geo_lat"], $resultOne["suggestions"][0]["data"]["geo_lon"], $_SESSION['last_search']->start_lat, $_SESSION['last_search']->start_lon);
-        $d2 = distance($resultTwo["suggestions"][0]["data"]["geo_lat"], $resultTwo["suggestions"][0]["data"]["geo_lon"], $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
-
+        // Проверяем расстояние, чтоб оно было меньше 1.5км от точек поиска до точек маршрута
         if ($d1 < 1500 && $d2 < 1500) {
             array_push($filter, $item);
         }
@@ -50,12 +49,15 @@ function trip($trips,$city)
     //Проверяем дату
     foreach ($filter as $item)
     {
+
+
         $date1 =new DateTime($item->data);
 
         $date2 = $_SESSION['last_search']->date;
         if ($date1->format('Y-m-d')==$date2){
             array_push($result,$item);
         }
+
     }
 
     return $result;
@@ -84,7 +86,7 @@ if (isset($data['find'])) {
     $find->date = $data['date'];
     $dadata->close();
     R::store($find);
-    unset($_SESSION['last_search']);
+
     $_SESSION['last_search'] = $find;
 
 
