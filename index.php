@@ -6,7 +6,6 @@ require "libs/dadata.php";
 include "distance.php";
 
 
-
 $data = $_POST;
 
 $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
@@ -14,10 +13,9 @@ $secret = "2db57c4bf885349d4f342858fb8e1de2faf7d81f";
 
 $city = "Ростов-на-Дону";
 
-if(isset($data['city']))
-{
-$city = $data['city'];
-$_SESSION['city']= $data['city'];
+if (isset($data['city'])) {
+    $city = $data['city'];
+    $_SESSION['city'] = $data['city'];
 }
 
 if (isset($data['find'])) {
@@ -28,10 +26,10 @@ if (isset($data['find'])) {
     $dadata = new Dadata($token, null);
     $dadata->init();
     //Запрос к API для нахождения адреса в городе, выбранным пользователем
-    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
-    $resultOne=$dadata->suggest("address", $fieldsOne);
-    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
-    $resultTwo=$dadata->suggest("address", $fieldsTwo);
+    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city" => $_SESSION['city']));
+    $resultOne = $dadata->suggest("address", $fieldsOne);
+    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city" => $_SESSION['city']));
+    $resultTwo = $dadata->suggest("address", $fieldsTwo);
 
     //Сохраняем в базу запросов поиска
     $find = R::dispense('finds');
@@ -39,11 +37,11 @@ if (isset($data['find'])) {
     $find->startLon = $resultOne["suggestions"][0]["data"]["geo_lon"];
     $find->endLat = $resultTwo["suggestions"][0]["data"]["geo_lat"];
     $find->endLon = $resultTwo["suggestions"][0]["data"]["geo_lon"];
-    $find->date=$data['date'];
+    $find->date = $data['date'];
     $dadata->close();
     R::store($find);
 
-    $_SESSION['last_search']=$find;
+    $_SESSION['last_search'] = $find;
     sleep(5);
     header('Location: /find.php');
 
@@ -71,7 +69,7 @@ if (isset($data['find'])) {
     <link rel="stylesheet" href="assets/fonts/material-icons.min.css">
     <link rel="stylesheet" href="assets/css/Navbar-Centered-Brand.css">
     <link rel="stylesheet" href="assets/css/Toggle-Switch-2.css">
-    <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
+
 
 </head>
 <body style="/*background: url(&quot;design.jpg&quot;);*/background-position: 0 -60px;">
@@ -83,13 +81,15 @@ if (isset($data['find'])) {
         <div class="row">
             <div class="col d-flex d-xl-flex justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center"
                  style="border-radius: 32px;box-shadow: 0px 8px 16px rgba(17,17,17,0.04);--bs-body-bg: var(--bs-white);--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;background: var(--bs-white);height: 630.4px;">
-                <iframe allowfullscreen frameborder="0" src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&amp;origin=<?php echo $_SESSION['last_search']->start?>;destination=<?php echo $_SESSION['last_search']->end?>;zoom=12" width="100%" height="100%" style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;border-radius: 32px;margin-top: 0;margin-bottom: 0px;height: 600px;"></iframe>
+                <iframe allowfullscreen frameborder="0" src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&origin=<?php echo $_SESSION['last_search']->start_lat?>,<?php echo $_SESSION['last_search']->start_lon ?>&destination=<?php echo $_SESSION['last_search']->end_lat?>,<?php echo $_SESSION['last_search']->end_lon ?>&zoom=12&mode=driving" width="100%" height="100%"
+                        style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;border-radius: 32px;margin-top: 0;margin-bottom: 0px;height: 600px;"></iframe>
 
             </div>
             <div class="col-md-6 col-xl-4 col-xxl-4 d-flex justify-content-center align-items-center m-auto justify-content-sm-center align-items-xl-center justify-content-xxl-center align-items-xxl-center">
 
-               <!--Form with navigation-->
-                <form action="index.php" method="post" class="d-flex flex-column justify-content-center align-items-center align-content-center m-auto p-3 p-xl-4"
+                <!--Form with navigation-->
+                <form action="index.php" method="post"
+                      class="d-flex flex-column justify-content-center align-items-center align-content-center m-auto p-3 p-xl-4"
                       style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;margin-top: 0px;"
                       data-bss-redirect-url="find.php">
 
@@ -107,7 +107,8 @@ if (isset($data['find'])) {
                                           d="M5.79417 16.5183C2.19424 13.0909 2.05438 7.39409 5.48178 3.79417C8.90918 0.194243 14.6059 0.054383 18.2059 3.48178C21.8058 6.90918 21.9457 12.6059 18.5183 16.2059L12.3124 22.7241L5.79417 16.5183ZM17.0698 14.8268L12.243 19.8965L7.17324 15.0698C4.3733 12.404 4.26452 7.97318 6.93028 5.17324C9.59603 2.3733 14.0268 2.26452 16.8268 4.93028C19.6267 7.59603 19.7355 12.0268 17.0698 14.8268Z"
                                           fill="currentColor"></path>
                                 </svg></span><input class="form-control" type="text"
-                                                    style="border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;" id="start"
+                                                    style="border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;"
+                                                    id="start"
                                                     name="start"
                                                     placeholder="Откуда" required="">
                         <button class="btn btn-primary" type="button"
@@ -129,7 +130,7 @@ if (isset($data['find'])) {
                                     style="width: 24px;height: 24px;">location_on</i></span><input class="form-control"
                                                                                                    type="text"
                                                                                                    style="border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;height: 46.8px;"
-                                                                                                   name="end";
+                                                                                                   name="end" ;
                                                                                                    placeholder="Куда"
                                                                                                    required="">
                         <button class="btn btn-primary" type="button"
@@ -144,7 +145,7 @@ if (isset($data['find'])) {
                     <input class="form-control" type="date" name="date" required=""
                            style="width: 325px;height: 46.8px;margin-top: 20px;border-color: #14142b;border-bottom-color: #14142b;padding-right: 30px;padding-left: 107px;font-family: Poppins, sans-serif;">
                     <button class="btn btn-primary d-xxl-flex justify-content-xxl-center align-items-xxl-center"
-                            type="submit" name ="find"
+                            type="submit" name="find"
                             style="--bs-primary: #5f2eea;--bs-primary-rgb: 95,46,234;width: 200px;height: 65px;margin-left: 0px;background: #5f2eea;border-radius: 16px;margin-top: 40px;">
                         Найти
                     </button>

@@ -5,24 +5,20 @@ include "findelement.php";
 include "distance.php";
 
 
-
-
-
 $data = $_POST;
 $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
 $secret = "2db57c4bf885349d4f342858fb8e1de2faf7d81f";
 
 $city = "Ростов-на-Дону";
 
-if(isset($data['city']))
-{
+if (isset($data['city'])) {
     $city = $data['city'];
-    $_SESSION['city']= $data['city'];
+    $_SESSION['city'] = $data['city'];
 }
 $trips = R::find("trips");
 
 //Проверяем параметры отображения
-function trip($trips,$city)
+function trip($trips, $city)
 {
     $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
     $dadata = new Dadata($token, null);
@@ -32,10 +28,10 @@ function trip($trips,$city)
     foreach ($trips as $item) {
 
         //расстояние от 1 обозначенного адреса пассажиром до 1 адреса водителя
-        $d1 = distance($item->start_lat,$item->start_lon, $_SESSION['last_search']->start_lat, $_SESSION['last_search']->start_lon);
+        $d1 = distance($item->start_lat, $item->start_lon, $_SESSION['last_search']->start_lat, $_SESSION['last_search']->start_lon);
 
         //расстояние от 2 обозначенного адреса пассажиром до 2 адреса водителя
-        $d2 = distance($item->start_lat,$item->start_lon, $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
+        $d2 = distance($item->start_lat, $item->start_lon, $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
 
         // Проверяем расстояние, чтоб оно было меньше 1.5км от точек поиска до точек маршрута
         if ($d1 < 1500 && $d2 < 1500) {
@@ -47,15 +43,14 @@ function trip($trips,$city)
 
     $result = array();
     //Проверяем дату
-    foreach ($filter as $item)
-    {
+    foreach ($filter as $item) {
 
 
-        $date1 =new DateTime($item->data);
+        $date1 = new DateTime($item->data);
 
         $date2 = $_SESSION['last_search']->date;
-        if ($date1->format('Y-m-d')==$date2){
-            array_push($result,$item);
+        if ($date1->format('Y-m-d') == $date2) {
+            array_push($result, $item);
         }
 
     }
@@ -92,27 +87,25 @@ if (isset($data['find'])) {
 
 }
 $result = array();
-if(isset($data['filter'])){
-    $el = trip($trips,$city);
-    foreach ($el as $item){
-        if(($data['animal'] == null && $item->animal == "0" || $data['animal'] == "on" && $item->animal == "1")
+if (isset($data['filter'])) {
+    $el = trip($trips, $city);
+    foreach ($el as $item) {
+        if (($data['animal'] == null && $item->animal == "0" || $data['animal'] == "on" && $item->animal == "1")
             && ($data['seats'] == null && $item->seats == "0" || $data['seats'] == "on" && $item->seats == "1")
             && ($data['baby'] == null && $item->baby == "0" || $data['baby'] == "on" && $item->baby == "1")
             && ($data['smoke'] == null && $item->smoke == "0" || $data['smoke'] == "on" && $item->smoke == "1")
-            && ($data['gender'] == $item->gender )
-        ){
-        array_push($result,$item);
+            && ($data['gender'] == $item->gender)
+        ) {
+            array_push($result, $item);
         }
     }
-}
-else
-{
-    $result=trip($trips,$city);
+} else {
+    $result = trip($trips, $city);
 }
 
 if (isset($data['booking'])) {
 
-    if(R::count("passengers", "passid = ?", array($_SESSION['logged_user']->id))<1) {
+    if (R::count("passengers", "passid = ?", array($_SESSION['logged_user']->id)) < 1) {
         $passenger = R::dispense('passengers');
         $passenger->tripid = $data['booking'];
         $passenger->passid = $_SESSION['logged_user']->id;
@@ -229,7 +222,7 @@ if (isset($data['booking'])) {
             <!--Filter-->
             <div class="col-md-5 col-lg-4 col-xl-3 col-xxl-3 d-flex justify-content-center flex-wrap justify-content-sm-center">
                 <form class="d-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-lg-center align-items-xl-center align-items-xxl-center"
-                     action="find.php" method="post">
+                      action="find.php" method="post">
 
                     <!--animal-->
                     <div class="d-flex d-xxl-flex flex-row flex-grow-0 align-items-center justify-content-xxl-center align-items-xxl-center"

@@ -10,12 +10,12 @@ if (!isset($_SESSION['logged_user'])) {
 $data = $_POST;
 $user = R::findOne('users', 'id = ?', array($_SESSION['logged_user']->id));
 $tripsDriver = R::find("trips", "driver = ?", array($user->person));
-$tripsPassenger = R::find("passengers", "passid = ?", array($_SESSION['logged_user']->id) );
+$tripsPassenger = R::find("passengers", "passid = ?", array($_SESSION['logged_user']->id));
 
 $filtertrips = array();
-foreach ($tripsPassenger as $item){
+foreach ($tripsPassenger as $item) {
 
-    $filtertrips = R::find('trips',"id = ?", array($item->tripid));
+    $filtertrips = R::find('trips', "id = ?", array($item->tripid));
 }
 
 
@@ -71,8 +71,8 @@ if (isset($data['delete'])) {
                 </div>
 
                 <!--Elements-->
-                <?php printElement($tripsDriver);  ?>
-                <?php printElement($filtertrips);  ?>
+                <?php printElement($tripsDriver); ?>
+                <?php printElement($filtertrips); ?>
 
 
             </div>

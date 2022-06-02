@@ -15,50 +15,51 @@
                                                  data-bs-toggle="dropdown" href="#"
                                                  style="--bs-body-font-weight: normal;font-family: Poppins, sans-serif;font-weight: bold;color: #160141;"><i
                                 class="la la-location-arrow"
-                                style="margin-bottom: 0px;margin-right: 5px;transform: rotate(45deg);font-weight: bold;"></i>Город: <?php echo $_SESSION['city']?></a>
+                                style="margin-bottom: 0px;margin-right: 5px;transform: rotate(45deg);font-weight: bold;"></i>Город: <?php echo $_SESSION['city'] ?>
+                    </a>
                     <div class="dropdown-menu">
                         <form action="index.php" method="post"
                               class="d-flex d-xxl-flex flex-column justify-content-xxl-center">
-                            <button class="btn btn-primary" type="submit" name="city"value="Москва"
+                            <button class="btn btn-primary" type="submit" name="city" value="Москва"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Москва
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Санкт-Петербург"
+                            <button class="btn btn-primary" type="submit" name="city" value="Санкт-Петербург"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Санкт-Петербург
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Воронеж"
+                            <button class="btn btn-primary" type="submit" name="city" value="Воронеж"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Воронеж
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Нижний Новгород"
+                            <button class="btn btn-primary" type="submit" name="city" value="Нижний Новгород"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Нижний Новгород
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Ростов-на-Дону"
+                            <button class="btn btn-primary" type="submit" name="city" value="Ростов-на-Дону"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Ростов-на-Дону
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Омск"
+                            <button class="btn btn-primary" type="submit" name="city" value="Омск"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Омск
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Новосибирск"
+                            <button class="btn btn-primary" type="submit" name="city" value="Новосибирск"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Новосибирск
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Екатеринбург"
+                            <button class="btn btn-primary" type="submit" name="city" value="Екатеринбург"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Екатеринбург
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Красноярск"
+                            <button class="btn btn-primary" type="submit" name="city" value="Красноярск"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Красноярск
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Казань"
+                            <button class="btn btn-primary" type="submit" name="city" value="Казань"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Казань
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Пермь"
+                            <button class="btn btn-primary" type="submit" name="city" value="Пермь"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Пермь
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Челябинск"
+                            <button class="btn btn-primary" type="submit" name="city" value="Челябинск"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Челябинск
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Самара"
+                            <button class="btn btn-primary" type="submit" name="city" value="Самара"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Самара
                             </button>
-                            <button class="btn btn-primary" type="submit" name="city"value="Уфа"
+                            <button class="btn btn-primary" type="submit" name="city" value="Уфа"
                                     style="background: #ffffff;color: #14142b;border-style: none;">Уфа
                             </button>
                             <button class="btn btn-primary" type="submit" name="city" value="Новосибирск"

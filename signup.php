@@ -27,8 +27,8 @@ if (isset($data['signup'])) {
         $user->avatar = "avatar.jpg";
         $user->person = null;
         $user->phone = null;
-        $user->car =null;
-        $user->gender=null;
+        $user->car = null;
+        $user->gender = null;
         R::store($user);
         header('Location: /profile.php');
         $_SESSION['logged_user'] = $user;

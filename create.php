@@ -9,8 +9,7 @@ if (!isset($_SESSION['logged_user'])) {
     header("Location: /login.php");
 }
 
-if($_SESSION['logged_user']->car == null)
-{
+if ($_SESSION['logged_user']->car == null) {
     header("Location: /profile.php");
 }
 
@@ -23,15 +22,15 @@ if (isset($data['create'])) {
 
     $dadata = new Dadata($token, null);
     $dadata->init();
-    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
-    $resultOne=$dadata->suggest("address", $fieldsOne);
-    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city"=>$_SESSION['city']));
-    $resultTwo=$dadata->suggest("address", $fieldsTwo);
+    $fieldsOne = array("query" => $data['start'], "count" => 1, "locations" => array("city" => $_SESSION['city']));
+    $resultOne = $dadata->suggest("address", $fieldsOne);
+    $fieldsTwo = array("query" => $data['end'], "count" => 1, "locations" => array("city" => $_SESSION['city']));
+    $resultTwo = $dadata->suggest("address", $fieldsTwo);
 
     $trip = R::dispense('trips');
     $trip->driver = $user->person;
     $trip->avatar = $user->avatar;
-    $trip->gender=$user->gender;
+    $trip->gender = $user->gender;
 
     //добавляем координаты точек широта и долгота
     $trip->startLat = $resultOne["suggestions"][0]["data"]["geo_lat"];
@@ -39,7 +38,7 @@ if (isset($data['create'])) {
     $trip->endLat = $resultTwo["suggestions"][0]["data"]["geo_lat"];
     $trip->endLon = $resultTwo["suggestions"][0]["data"]["geo_lon"];
 
-    $trip->city=$_SESSION['city'];
+    $trip->city = $_SESSION['city'];
     $trip->phone = $user->phone;
     $trip->car = $user->car;
     $trip->start = $data['start'];

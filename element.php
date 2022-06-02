@@ -1,16 +1,16 @@
 <?php
 
-function countPassenger($item){
+function countPassenger($item)
+{
     $passengers = array();
-    $count =0;
+    $count = 0;
     $passengers = R::findAll('passengers', 'tripid = ?', array($item->id));
-    foreach ($passengers as $it)
-    {
+    foreach ($passengers as $it) {
         $count++;
     }
 
 
-return $count;
+    return $count;
 }
 
 function printPassengers($elem)
@@ -20,11 +20,11 @@ function printPassengers($elem)
 
 
     foreach ($passengers as $item) {
-        $users = R::findOne("users","id = ?", array($item->passid) );
-       echo '
+        $users = R::findOne("users", "id = ?", array($item->passid));
+        echo '
                                         <input class="d-flex d-xl-flex flex-shrink-1" type="text"
                                                style="border-style: none;color: #6e7191;font-family: Poppins, sans-serif;width: 150px;height: 30px;"
-                                               placeholder="Имя Фамилия" value="'.$users->person.'" autocomplete="on" inputmode="latin-name"
+                                               placeholder="Имя Фамилия" value="' . $users->person . '" autocomplete="on" inputmode="latin-name"
                                                readonly="">
                                     ';
     }
@@ -35,19 +35,15 @@ function printElement($trip)
 {
     foreach ($trip as $item) {
 
-        $status =null;
-        if ($item->driver==$_SESSION['logged_user']->person)
-        {
+        $status = null;
+        if ($item->driver == $_SESSION['logged_user']->person) {
             $status = "Cоздано";
-        }
-        else
-        {
-           $passenger = R::find("passengers", "passid = ?", array($_SESSION['logged_user']->id) );
-           foreach ($passenger as $it)
-           if ($item->id == $it->tripid)
-            {
-                $status = "Забронировано";
-            }
+        } else {
+            $passenger = R::find("passengers", "passid = ?", array($_SESSION['logged_user']->id));
+            foreach ($passenger as $it)
+                if ($item->id == $it->tripid) {
+                    $status = "Забронировано";
+                }
         }
 
         echo '<div class="d-flex flex-row justify-content-center align-items-center justify-content-sm-center align-items-sm-center justify-content-md-center align-items-md-center justify-content-lg-center align-items-lg-center justify-content-xl-center align-items-xl-center justify-content-xxl-center align-items-xxl-center"
@@ -56,8 +52,8 @@ function printElement($trip)
                                                            style="color: #14142b;width: 77px;height: 30px;font-size: 24px;font-weight: bold;margin-bottom: 3px;border-style: none;"
                                                            value="' . $item->price . '₽"><input class="d-flex" type="text" readonly=""
                                                                                 style="color: #6e7191;height: 30px;width: 112px;font-family: Poppins, sans-serif;font-size: 18px;font-weight: bold;border-style: none;"
-                                                                                value="' .(new DateTime($item->data))->format('Y-m-d') . '"></div>
-                    <input class="d-flex d-xxl-flex" type="text" readonly="" value="'.$status.'"
+                                                                                value="' . (new DateTime($item->data))->format('Y-m-d') . '"></div>
+                    <input class="d-flex d-xxl-flex" type="text" readonly="" value="' . $status . '"
                            style="width: 130px;height: 30px;font-family: Poppins, sans-serif;font-size: 15px;color: #14142b;font-weight: bold;padding: 0px;margin-left: 40px;margin-right: 60px;border-style: none;"><a
                             class="btn btn-primary d-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center"
                             role="button"
@@ -77,7 +73,7 @@ function printElement($trip)
                                 </div>
                                 <div class="modal-body d-flex d-xxl-flex flex-column align-items-xxl-center">
                                     <iframe allowfullscreen="" frameborder="0" loading="lazy"
-                                            src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&amp;origin=%D0%92%D1%8F%D1%82%D1%81%D0%BA%D0%B0%D1%8F+114&amp;destination=%D0%9D%D0%BE%D0%B2%D0%BE%D0%BB%D0%B5%D1%81%D0%BD%D0%B0%D1%8F+1&amp;zoom=12"
+                                            src="https://www.google.com/maps/embed/v1/directions?key=AIzaSyDEFhtUdMNKUqHGRJ3fy5Rk4Zj1TAmV6CU&origin='.$item->start_lat.','.$item->start_lon.'&destination='.$item->end_lat.','.$item->end_lon.'&zoom=12&mode=driving"
                                             width="100%" height="400" style="border-radius: 32px;"></iframe>
                                     <div class="row d-flex flex-row justify-content-xl-center" style="margin: 0px;">
                                         <div class="col-md-12 col-lg-6 col-xl-5 col-xxl-7 offset-xl-0 offset-xxl-0 d-flex d-xxl-flex flex-column align-items-center align-items-sm-center align-items-md-center align-items-xxl-center"
@@ -180,12 +176,12 @@ function printElement($trip)
                                                             class="form-control d-flex d-xxl-flex flex-wrap justify-content-xxl-start align-items-xxl-center"
                                                             type="text"
                                                             style="background: #eff0f6;border-style: none;border-top-color: #14142b;border-right-color: #ffffff;border-bottom-color: #14142b;border-left-color: #ffffff;padding-right: 0px;padding-bottom: 7.6px;padding-top: 8.6px;color: #6f6c90;font-weight: bold;width: 107px;"
-                                                            readonly="" '.(($item->seats >0)? 'value="Занято: '.countPassenger($item).'/2 ' : 'value="Занято: '.countPassenger($item).'/3 "').' 
+                                                            readonly="" ' . (($item->seats > 0) ? 'value="Занято: ' . countPassenger($item) . '/2 ' : 'value="Занято: ' . countPassenger($item) . '/3 "') . ' 
                                                             class="btn btn-primary d-xl-flex align-items-xl-center justify-content-xxl-center"
                                                             role="button"
                                                             style="background: #eff0f6;border-top-right-radius: 16px;border-bottom-right-radius: 16px;height: 24px;padding: 0px;margin-left: 0px;width: 24px;border-style: none;border-top-color: #14142b;border-right-color: #14142b;border-bottom-color: #14142b;border-left-color: #ffffff;font-weight: bold;"
-                                                            data-bs-target="#modal-2-'.$item->id.'" data-bs-toggle="modal"
-                                                            href="#modal-2-'.$item->id.'"><i class="la la-info-circle"
+                                                            data-bs-target="#modal-2-' . $item->id . '" data-bs-toggle="modal"
+                                                            href="#modal-2-' . $item->id . '"><i class="la la-info-circle"
                                                                                style="color: #14142b;font-weight: bold;"></i>
                                                                             
                                                     </div>
@@ -205,7 +201,7 @@ function printElement($trip)
                     </div>
 
                     
-                   <!-- <div class="modal fade" role="dialog" tabindex="-1" id="modal-2-'.$item->id .'">
+                   <!-- <div class="modal fade" role="dialog" tabindex="-1" id="modal-2-' . $item->id . '">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">

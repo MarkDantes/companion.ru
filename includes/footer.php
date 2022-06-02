@@ -1,4 +1,3 @@
-
 <footer class="bg-primary-gradient" style="--bs-body-bg: #ffffff;height: 150px;margin-left: 0px;">
     <div class="container py-4 py-lg-5" style="margin: 51px;height: 0px;margin-bottom: 0px;">
         <p class="mb-0"
