@@ -20,16 +20,21 @@ foreach ($tripsPassenger as $item) {
 
 
 if (isset($data['delete'])) {
+
+    //Если пассажир, то удалить из бронирования
     $passenger = R::findOne("passengers",$data['delete']);
-    var_dump($passenger->passid,$_SESSION['logged_user']->id);
-    var_dump($data["delete"]);
     if($passenger->passid == $_SESSION['logged_user']->id){
     $pass = R::load("passengers",$passenger->id);
     R::trash($pass);
-    } else if($passenger->passid != $_SESSION['logged_user']->id){
-        $trip = R::load('trips', $data['delete']);
-        R::trash($trip);
+    } else {
+        $trip = R::findOne("trips", $data['delete']);
+        if ($trip->driver == $_SESSION['logged_user']->person) {
+            $item = R::load("trips",$data['delete']);
+            R::trash($item);
     }
+    }
+
+
 
 
 }
