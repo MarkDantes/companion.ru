@@ -44,7 +44,6 @@ if (isset($data['find'])) {
     R::store($find);
 
     $_SESSION['last_search'] = $find;
-    sleep(5);
     header('Location: /find.php');
 
 
