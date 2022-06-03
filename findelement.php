@@ -181,7 +181,7 @@ function printElementFind($trip)
                                 </div>
                                 <div class="modal-footer d-flex justify-content-center justify-content-sm-center justify-content-md-center justify-content-lg-center justify-content-xl-center justify-content-xxl-center align-items-xxl-center">
                                     <form action="find.php" method="post">
-                                    <button class="btn btn-primary" type="submit" name="booking" ' . (((countPassenger($item) == 2 && $item->seats == 1 || countPassenger($item) == 3 && $item->seats == 0) || !isset($_SESSION['logged_user']) || $_SESSION['logged_user']->person == $item->driver) ? 'disabled' : '') . ' value="' . $item->id . '"
+                                    <button class="btn btn-primary" type="submit" name="booking"  ' . (((countPassenger($item) == 2 && $item->seats == 1 || countPassenger($item) == 3 && $item->seats == 0) || !isset($_SESSION['logged_user']) || $_SESSION['logged_user']->person == $item->driver) ? 'disabled' : '') . ' value="' . $item->id . '"
                                             style="background: #5f2eea;width: 200px;height: 55px;">Забронировать
                                     </button>
                                     </form>

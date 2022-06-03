@@ -105,12 +105,12 @@ if (isset($data['filter'])) {
 
 if (isset($data['booking'])) {
 
-    if (R::count("passengers", "passid = ?", array($_SESSION['logged_user']->id)) < 1) {
+
         $passenger = R::dispense('passengers');
         $passenger->tripid = $data['booking'];
         $passenger->passid = $_SESSION['logged_user']->id;
         R::store($passenger);
-    }
+
 }
 
 ?>
