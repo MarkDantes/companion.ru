@@ -20,8 +20,17 @@ foreach ($tripsPassenger as $item) {
 
 
 if (isset($data['delete'])) {
-    $trip = R::load('trips', $data['delete']);
-    R::trash($trip);
+    $passenger = R::findOne("passengers",$data['delete']);
+    var_dump($passenger->passid,$_SESSION['logged_user']->id);
+    var_dump($data["delete"]);
+    if($passenger->passid == $_SESSION['logged_user']->id){
+    $pass = R::load("passengers",$passenger->id);
+    R::trash($pass);
+    } else if($passenger->passid != $_SESSION['logged_user']->id){
+        $trip = R::load('trips', $data['delete']);
+        R::trash($trip);
+    }
+
 
 }
 ?>

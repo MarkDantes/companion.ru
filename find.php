@@ -20,6 +20,7 @@ $trips = R::find("trips");
 //Проверяем параметры отображения
 function trip($trips, $city)
 {
+
     $token = "9d73f28773e4d4b8b4595ef831d45b0532ea6bf7";
     $dadata = new Dadata($token, null);
     $dadata->init();
@@ -31,15 +32,17 @@ function trip($trips, $city)
         $d1 = distance($item->start_lat, $item->start_lon, $_SESSION['last_search']->start_lat, $_SESSION['last_search']->start_lon);
 
         //расстояние от 2 обозначенного адреса пассажиром до 2 адреса водителя
-        $d2 = distance($item->start_lat, $item->start_lon, $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
-
+        $d2 = distance($item->end_lat, $item->end_lon, $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
+        var_dump($d1,$d2);
         // Проверяем расстояние, чтоб оно было меньше 1.5км от точек поиска до точек маршрута
         if ($d1 < 1500 && $d2 < 1500) {
             array_push($filter, $item);
         }
 
     }
+
     $dadata->close();
+
 
     $result = array();
     //Проверяем дату
@@ -54,6 +57,7 @@ function trip($trips, $city)
         }
 
     }
+
 
     return $result;
 
@@ -103,13 +107,29 @@ if (isset($data['filter'])) {
     $result = trip($trips, $city);
 }
 
+
+
 if (isset($data['booking'])) {
 
+        //Ищем все забронированные поездки пассажира
+        $trip = R::find("passengers",array($_SESSION["logged_user"]->id));
 
+        $flag = true;
+        //если находим такую же, то больше не бронируем
+        foreach ($trip as $item)
+        {
+        if($item->tripid == $data['booking'])
+        {
+            $flag=false;
+        }
+        }
+
+        if($trip->tripid != $data['booking'] && $flag){
         $passenger = R::dispense('passengers');
         $passenger->tripid = $data['booking'];
         $passenger->passid = $_SESSION['logged_user']->id;
         R::store($passenger);
+        }
 
 }
 

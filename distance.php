@@ -31,5 +31,4 @@ function distance($st, $sn, $lt, $ln)
 
     return $dist;
 }
-
 ?>
