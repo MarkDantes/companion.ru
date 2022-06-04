@@ -46,7 +46,6 @@ if (isset($data['find'])) {
     $_SESSION['last_search'] = $find;
     header('Location: /find.php');
 
-
 }
 
 ?>

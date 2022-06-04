@@ -22,20 +22,18 @@ foreach ($tripsPassenger as $item) {
 if (isset($data['delete'])) {
 
     //Если пассажир, то удалить из бронирования
-    $passenger = R::findOne("passengers",$data['delete']);
-    if($passenger->passid == $_SESSION['logged_user']->id){
-    $pass = R::load("passengers",$passenger->id);
-    R::trash($pass);
-    } else {
-        $trip = R::findOne("trips", $data['delete']);
+    $passenger = R::findOne("passengers", "tripid = ?", array($data['delete']));
+    if ($passenger->passid == $_SESSION['logged_user']->id) {
+        $pass = R::load("passengers", $passenger->id);
+        R::trash($pass);
+    } else //если водитель, то удалить из базы поездок
+    {
+        $trip = R::findOne("trips", "id = ?", array($data['delete']));
         if ($trip->driver == $_SESSION['logged_user']->person) {
-            $item = R::load("trips",$data['delete']);
+            $item = R::load("trips", $data['delete']);
             R::trash($item);
+        }
     }
-    }
-
-
-
 
 }
 ?>

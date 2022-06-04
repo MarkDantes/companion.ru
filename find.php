@@ -33,7 +33,7 @@ function trip($trips, $city)
 
         //расстояние от 2 обозначенного адреса пассажиром до 2 адреса водителя
         $d2 = distance($item->end_lat, $item->end_lon, $_SESSION['last_search']->end_lat, $_SESSION['last_search']->end_lon);
-        var_dump($d1,$d2);
+
         // Проверяем расстояние, чтоб оно было меньше 1.5км от точек поиска до точек маршрута
         if ($d1 < 1500 && $d2 < 1500) {
             array_push($filter, $item);
@@ -123,7 +123,7 @@ if (isset($data['booking'])) {
             $flag=false;
         }
         }
-
+        //Если поездка ранее не была забронирована, то бронируем её, записывая id пассажира и поездки в поля таблицы passengers
         if($trip->tripid != $data['booking'] && $flag){
         $passenger = R::dispense('passengers');
         $passenger->tripid = $data['booking'];
